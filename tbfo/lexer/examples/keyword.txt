@@ -1,0 +1,82 @@
+WORD
+FROM from
+IMPORT import
+AS as
+CLASS class
+DEF def
+RETURN return
+PASS pass
+RAISE raise
+CONTINUE continue
+BREAK break
+IF if
+ELIF elif
+ELSE else
+FOR for
+WHILE while
+NONE None
+TRUE True
+FALSE False
+WITH with
+
+NOT not
+AND and
+OR or
+IS is
+IN in
+
+SYMBOL
+ADD +
+SUB -
+MUL *
+MATMUL @
+DIV /
+MOD %
+BAND &
+BOR |
+BXOR ^
+BSHL <<
+BSHR >>
+POW **
+IDIV //
+
+EQ ==
+NEQ !=
+GEQT >=
+GT >
+LEQT <=
+LT <
+
+ASSIGN =
+COLON :
+SEMICOLON ;
+DOT .
+LB [
+RB ]
+LP (
+RP )
+COMMA ,
+
+AUGASSIGN
+ADDA +=
+SUBA -=
+MULA *=
+MATMULA @=
+DIVA /=
+MODA %=
+BANDA &=
+BORA |=
+BXORA ^=
+BSHLA <<=
+BSHRA >>=
+POWA **=
+IDIVA //=
+
+SPECIAL
+STRING " "
+STRING ' '
+
+IGNORE
+COMMENT # \n
+COMMENT """ """
+COMMENT ''' '''
