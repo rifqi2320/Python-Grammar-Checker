@@ -13,23 +13,29 @@ class Symbol:
 class Lexer:
   def __init__(self):
     self.symbols = []
+    self.keywords = []
+    self.whitespace = []
     with open(os.path.dirname(os.path.realpath(__file__)) + "\\keyword.txt") as f:
       lines = f.readlines()
-      flag = False
-      for line in lines:
-        if line[0] == '#':
-          continue
-        if (line.strip() == "NON-SPACE"):
-          flag = True
-        temp = line.strip().split()
-        if len(temp) == 2:
-          if flag:
-            self.symbols.append(Symbol(temp[0], temp[1]))
-          else:
-            self.symbols.append(Symbol(temp[0], temp[1] + " "))
-    self.symbols.append(Symbol("SPACE", " "))
-    self.symbols.append(Symbol("NL", "\r\n"))
-    self.symbols.append(Symbol("NL", "\n"))
+    flag = False
+    for line in lines:
+      if line[0] == '#':
+        continue
+      if (line.strip() == "SYMBOL"):
+        flag = True
+        self.whitespace.append(Symbol("SPACE", " "))
+        self.whitespace.append(Symbol("NL", "\r\n"))
+        self.whitespace.append(Symbol("NL", "\n"))
+
+      temp = line.strip().split()
+      if len(temp) == 2:
+        if flag:
+          self.symbols.append(Symbol(temp[0], temp[1]))
+        else:
+          self.keywords.append(Symbol(temp[0], temp[1]))
+    
+          
+
 
     # Helper (Finite Automata)
     self.varCheck = VariableChecker()
@@ -46,8 +52,8 @@ class Lexer:
 
   def lex(self, line):
     res = [line]
-    # Tokenize symbol
-    for sym in self.symbols:
+    # Tokenize symbol and whitespace
+    for sym in self.symbols + self.whitespace:
       n = len(sym.symbol)
       for i in range(len(res) -1 , -1, -1):
         if (type(res[i]) == str):
@@ -58,6 +64,12 @@ class Lexer:
               res.insert(i, text[find + n:])
               res.insert(i, sym)
               res.insert(i, text[:(find)])
+
+    # Tokenize keyword
+    for keyword in self.keywords:
+      for i in range(len(res) -1, -1, -1):
+        if res[i] == keyword.symbol:
+          res[i] = keyword
 
     # Clean empty element
     res = [x for x in res if x]
@@ -144,12 +156,26 @@ class Lexer:
         check = [x for x in temp if type(x) != Symbol]
         if (check):
           raise SyntaxError(f"Invalid variable : {','.join(check)}.")
-        if (self.comment_flag):
-          raise SyntaxError(f"Unterminated multiline comments.")
         res += temp
+      if (self.comment_flag):
+          raise SyntaxError(f"Unterminated multiline comments.")
     except SyntaxError as e:
       print(f'Error in line: {i+1}')
       print(e)
+      print(lines[i])
       return None
     res.append(Symbol("ENDMARK", ""))
     return res
+
+if __name__ == '__main__':
+  with open("test.py") as f:
+    lines = f.readlines()
+  lexer = Lexer()
+  res = lexer.lex_lines(lines)
+  for line in lines:
+    print(line, end='')
+  print()
+  for a in res:
+    print(a,end=' ')
+    if (str(a) == "NL"):
+      print()
