@@ -1,7 +1,7 @@
 # Lexer only support ASCII Printable Characters
 # Anything over than printable should raise error
 
-SPACE
+KEYWORDS
 # Keywords
 FROM from
 IMPORT import
@@ -32,7 +32,7 @@ OR or
 IS is
 IN in
 
-NON-SPACE
+SYMBOL
 
 # Assignment (+ Augmented)
 ASSIGN =
