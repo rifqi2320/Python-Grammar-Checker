@@ -1,4 +1,4 @@
-WORD
+SPACE
 FROM from
 IMPORT import
 AS as
@@ -9,55 +9,22 @@ PASS pass
 RAISE raise
 CONTINUE continue
 BREAK break
-IF if
 ELIF elif
-ELSE else
+IF if
 FOR for
 WHILE while
 NONE None
 TRUE True
 FALSE False
 WITH with
-
 NOT not
 AND and
 OR or
 IS is
 IN in
 
-SYMBOL
-ADD +
-SUB -
-MUL *
-MATMUL @
-DIV /
-MOD %
-BAND &
-BOR |
-BXOR ^
-BSHL <<
-BSHR >>
-POW **
-IDIV //
-
-EQ ==
-NEQ !=
-GEQT >=
-GT >
-LEQT <=
-LT <
-
-ASSIGN =
-COLON :
-SEMICOLON ;
-DOT .
-LB [
-RB ]
-LP (
-RP )
-COMMA ,
-
-AUGASSIGN
+NON-SPACE
+ELSE else
 ADDA +=
 SUBA -=
 MULA *=
@@ -71,12 +38,40 @@ BSHLA <<=
 BSHRA >>=
 POWA **=
 IDIVA //=
+ADD +
+SUB -
+MUL *
+MATMUL @
+DIV /
+MOD %
+BAND &
+BOR |
+BXOR ^
+BSHL <<
+BSHR >>
+POW **
+IDIV //
+EQ ==
+NEQ !=
+GEQT >=
+GT >
+LEQT <=
+LT <
+TRIPLEQUOTE2 """
+TRIPLEQUOTE1 '''
+HASHTAG #
+ASSIGN =
+QUOTE2 "
+QUOTE1 '
+COLON :
+SEMICOLON ;
+ELIPSIS ...
+DOT .
+LB [
+RB ]
+LP (
+RP )
+COMMA ,
 
-SPECIAL
-STRING " "
-STRING ' '
 
-IGNORE
-COMMENT # \n
-COMMENT """ """
-COMMENT ''' '''
+
