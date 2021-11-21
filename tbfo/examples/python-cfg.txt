@@ -1,0 +1,161 @@
+# Composed unit productions and it's recursive productions
+# e.g. Zero or More (A*), One or More (A+), denoted by M*
+AugAssign -> ADDA | SUBA | MULA | MATMULA | DIVA | MODA | BANDA | BORA | BXORA | BSHLA | BSHRA | POWA | IDIVA
+CompOp -> LT | GT | EQ | GEQT | LEQT | NEQ | IN | NOT IN | IS | IS NOT
+TermOp -> MUL | MATMUL | DIV | MOD | IDIV
+ArithOp -> ADD | SUB
+FactorOp -> ArithOp | TILDE
+ShiftOp -> SHR | SHL
+MString -> STRING | MString String
+Atom -> LP List RP | LB List RB | LC DictSet RC | NAME | NUMBER | MString | ELLIPSIS | NONE | TRUE | FALSE
+DotEllipsis -> DOT | ELLIPSIS
+DotName -> NAME | DotName DOT NAME
+DotAsName -> DotName | DotName AS NAME
+DotAsNames -> DotAsName COMMA DotAsNames | DotAsName
+DotEllipsisName -> DotEllipsis DotEllipsisName | DotName
+DotEllipsisOneM -> DotEllipsis DotEllipsisOneM | DotEllipsis
+FromExpr -> DotEllipsisName | DotEllipsisOneM
+ImportAsName -> NAME | NAME AS NAME
+MImportAsNames -> COMMA ImportAsName MImportAsNames | e
+ImportAsNames -> ImportAsName MImportAsNames | ImportAsName MImportAsNames COMMA
+ImportExpr -> MUL | LP ImportAsNames RP | ImportAsNames
+
+# Atomic Expression
+AtomTrail -> Params | LB SubList RB | DOT NAME
+MAtomTrail -> AtomTrail MAtomTrail | e
+AtomExpr -> Atom MAtomTrail | AWAIT Atom MAtomTrail
+Power -> AtomExpr | AtomExpr POW Factor
+Factor -> FactorOp Factor | Power
+Term -> Factor | Term TermOp Factor
+
+# Binary and Arithmetic Expression
+ArithExpr -> Term | ArithExpr ArithOp Term
+ShiftExpr -> ArithExpr | ShiftExpr ShiftOp ArithExpr
+AndExpr -> ShiftExpr | AndExpr BAND ShiftExpr
+XorExpr -> AndExpr | XorExpr XOR AndExpr
+Expr -> XorExpr | Expr BOR XorExpr
+
+# Comparison and Logical Expression (Test)
+# Also combine it with Binary and Arithmetic Expression
+Comparison -> Expr | Comparison CompOp Expr
+NotTest -> NOT NotTest | Comparison
+AndTest -> NotTest | AndTest AND NotTest
+OrTest -> AndTest | OrTest OR AndTest
+Test -> OrTest | OrTest IF OrTest ELSE Test
+MTests -> COMMA Test | e
+Tests -> Test MTests | Test MTests COMMA
+
+# Assignment (+Augmented) Expression
+# Support for inline expression (test, incl. bin & arith)
+# and also star (spread) expression
+StarExpr -> MUL Expr
+ExprStmt -> TestsStarExpr AugAssign Tests | TestsStarExpr TestsStarExprStmt
+# (Test | StarExpr)
+TestStarExpr -> Test | StarExpr
+# (Test | StarExpr) (',' (Test | StarExpr))* [',']
+TestsStarExpr -> TestStarExpr MTestsStarExpr | TestStarExpr MTestsStarExpr COMMA
+# (',' (Test | StarExpr))*
+MTestsStarExpr -> COMMA TestStarExpr MTestsStarExpr | e
+TestsStarExprStmt -> ASSIGN TestsStarExpr TestsStarExprStmt | e
+
+# Multiple Expressions
+# Including Star Expression
+EStarExpr -> Expr | StarExpr
+MEStarExpr -> COMMA EStarExpr MEStarExpr | e
+Exprs -> EStarExpr MEStarExpr | EStarExpr MEStarExpr COMMA
+
+# Spread Operator for Dict (**)
+DStarExpr -> POW Expr
+# (Test ':' Test | '**' Expr)
+TestDStarExpr -> Test COLON Test | DStarExpr
+# (',' (Test ':' Test | '**' Expr))*
+MTestDStarExpr -> COMMA TestDStarExpr MTestDStarExpr | e
+
+
+# Arguments and Parameters
+Params -> LP RP | LP Args RP
+ClassParams -> Params | e
+Args -> Arg | Arg MArgs | Arg MArgs COMMA
+MArgs -> COMMA Args MArgs | e
+Arg -> NAME | NAME CompFor | NAME ASSIGN NAME | POW NAME | MUL NAME
+
+
+# List/Dict/Set Definition
+List -> TestStarExpr CompFor | TestsStarExpr
+DictSet -> Dict | Set
+Dict -> TestDStarExpr DictMake
+# (comp_for | (',' (test ':' test | '**' expr))* [','])
+DictMake -> CompFor | MTestDStarExpr | MTestDStarExpr COMMA
+Set -> TestStar SetMake
+# (comp_for | (',' (test | star_expr))* [','])
+SetMake -> CompFor | MTestsStarExpr | MTestsStarExpr COMMA
+
+# List Subscription (Indexing) and Slicing
+SubList -> Sub MSub | Sub MSub COMMA
+MSub -> COMMA Sub MSub | e
+# Subscription and Slicing Type:
+# 1. Indexing (e.g. x[Test])
+# 2. 1D Slicing (e.g. x[:], x[Test:], x[:Test], x[Test:Test])
+# 3. 2D Slicing (e.g. x[A:B:], x[A:B:Test])
+Sub -> Test | Slice | Slice SliceTwo
+Slice -> COLON | Test COLON | COLON Test | Test COLON Test 
+SliceTwo -> COLON | COLON Test
+
+# Comprehension
+CompList -> CompFor | CompIf
+CompFor -> FOR Exprs IN OrTest | FOR Exprs IN OrTest CompList
+CompIf -> IF OrTest | IF OrTest CompList
+
+
+# Basic building block
+# Started by many newline, or a statement
+Start -> NLStmt ENDMARKER
+NLStmt -> NL NLStmt | Stmt NLStmt | e
+# One Statement, could be Simple or Compound
+Stmt -> SimpleStmt | CompoundStmt
+# Multiple Statement
+MStmt -> Stmt | Stmt MStmt
+
+# 1. Simple Statement: Small Statement OR Multiple Small Statement separated by semicolon
+# Ended by NL
+# Also support trailing semicolon
+SimpleStmt -> SmallStmt NL | SmallStmt SEMICOLON NL | SmallStmt MultiSimpleStmt NL | SmallStmt MultiSimpleStmt SEMICOLON NL
+MultiSimpleStmt -> SEMICOLON SmallStmt SimpleStmt MultiSimpleStmt | e
+SmallStmt -> ExprStmt | PASS | Flow | Import
+# Small Statement Types
+# A. Expressions in Statement
+# B. Pass
+# C. Control Flow (Break, Continue, Return, Raise)
+Return -> RETURN | RETURN Tests
+Raise -> RAISE | RAISE Test | RAISE Test FROM Test
+Flow -> BREAK | CONTINUE | Return | Raise
+# D. Import (Import, From Import)
+Import -> ImportName | ImportFrom
+ImportName -> IMPORT DotAsNames
+ImportFrom -> FROM FromExpr IMPORT ImportExpr
+
+# 2. Compound Statement: If/While/For/With/FunDef/Async Statement
+# Each consist of one Section that could be either:
+# - One simple statement in the same line
+# - Multiple Any Statement in different line (min. 1)
+Section -> SimpleStmt | NL INDENT MStmt DEDENT
+CompoundStatement -> If | While | For | With | Func | Class | Async
+# Compound Statement Types
+# A. If
+If -> IF Test COLON Section Elif | IF Test COLON Section Elif Else 
+Elif -> ELIF Test COLON Section Elif | e
+Else -> ELSE COLON Section
+# B. While
+While -> WHILE Test COLON Section | WHILE Test COLON Section ELSE COLON Section
+# C. For
+For -> FOR Exprs IN Tests COLON Section | FOR Exprs IN Tests COLON Section ELSE COLON Section
+# D. With
+With -> WITH WithExpr COLON Suite
+WithExpr -> WithItem | WithExpr COMMA WithItem
+WithItem -> Test | Test AS Expr
+# E. Async
+Async -> ASYNC FunDef | ASYNC With | ASYNC For
+# F. Class
+Class -> CLASS NAME ClassParams COLON Section
+# G. Function
+Func -> DEF NAME Params COLON Section

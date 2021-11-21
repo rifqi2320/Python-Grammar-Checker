@@ -1,6 +1,12 @@
+# Lexer only support ASCII Printable Characters
+# Anything over than printable should raise error
+
 SPACE
+# Keywords
 FROM from
 IMPORT import
+ASYNC async
+AWAIT await
 AS as
 CLASS class
 DEF def
@@ -10,6 +16,7 @@ RAISE raise
 CONTINUE continue
 BREAK break
 ELIF elif
+ELSE else
 IF if
 FOR for
 WHILE while
@@ -17,6 +24,8 @@ NONE None
 TRUE True
 FALSE False
 WITH with
+
+# Boolean Logic
 NOT not
 AND and
 OR or
@@ -24,7 +33,9 @@ IS is
 IN in
 
 NON-SPACE
-ELSE else
+
+# Assignment (+ Augmented)
+ASSIGN =
 ADDA +=
 SUBA -=
 MULA *=
@@ -38,6 +49,8 @@ BSHLA <<=
 BSHRA >>=
 POWA **=
 IDIVA //=
+
+# Arithmetic and Binary Operator
 ADD +
 SUB -
 MUL *
@@ -51,6 +64,8 @@ BSHL <<
 BSHR >>
 POW **
 IDIV //
+
+# Logical Operator
 EQ ==
 NEQ <>
 NEQ !=
@@ -61,18 +76,23 @@ LT <
 TRIPLEQUOTE2 """
 TRIPLEQUOTE1 '''
 HASHTAG #
-ASSIGN =
+
+# Misc
 QUOTE2 "
 QUOTE1 '
 COLON :
 SEMICOLON ;
 ELIPSIS ...
 DOT .
+LC {
+RC }
 LB [
 RB ]
 LP (
 RP )
 COMMA ,
 
+# NL should be supported by Lexer
+# and defined as \n or \r\n (OS-specific)
 
-
+# End input will include a ENDMARK token
