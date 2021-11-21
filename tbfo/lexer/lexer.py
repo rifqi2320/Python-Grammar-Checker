@@ -15,21 +15,26 @@ class Lexer:
     self.symbols = []
     with open(os.path.dirname(os.path.realpath(__file__)) + "\\keyword.txt") as f:
       lines = f.readlines()
-      flag = False
-      for line in lines:
-        if line[0] == '#':
-          continue
-        if (line.strip() == "NON-SPACE"):
-          flag = True
-        temp = line.strip().split()
-        if len(temp) == 2:
-          if flag:
-            self.symbols.append(Symbol(temp[0], temp[1]))
-          else:
-            self.symbols.append(Symbol(temp[0], temp[1] + " "))
-    self.symbols.append(Symbol("SPACE", " "))
-    self.symbols.append(Symbol("NL", "\r\n"))
-    self.symbols.append(Symbol("NL", "\n"))
+    flag = False
+    i = 0
+    for line in lines:
+      if line[0] == '#':
+        continue
+      if (line.strip() == "NON-SPACE"):
+        flag = True
+        self.symbols.append(Symbol("SPACE", " "))
+        self.symbols.append(Symbol("NL", "\r\n"))
+        self.symbols.append(Symbol("NL", "\n"))
+      temp = line.strip().split()
+      if len(temp) == 2:
+        if flag:
+          self.symbols.insert(i,Symbol(temp[0], temp[1]))
+        else:
+          self.symbols.append(Symbol(temp[0], " " + temp[1] + " "))
+        i += 1
+    
+          
+
 
     # Helper (Finite Automata)
     self.varCheck = VariableChecker()
@@ -153,3 +158,12 @@ class Lexer:
       return None
     res.append(Symbol("ENDMARK", ""))
     return res
+
+if __name__ == '__main__':
+  with open("test.py") as f:
+    lines = f.readlines()
+  lexer = Lexer()
+  res = lexer.lex_lines(lines)
+  print(lines)
+  for a in res:
+    print(a,end=' ')
