@@ -17,6 +17,8 @@ class Lexer:
       lines = f.readlines()
       flag = False
       for line in lines:
+        if line[0] == '#':
+          continue
         if (line.strip() == "NON-SPACE"):
           flag = True
         temp = line.strip().split()
@@ -26,6 +28,7 @@ class Lexer:
           else:
             self.symbols.append(Symbol(temp[0], temp[1] + " "))
     self.symbols.append(Symbol("SPACE", " "))
+    self.symbols.append(Symbol("NL", "\r\n"))
     self.symbols.append(Symbol("NL", "\n"))
 
     # Helper (Finite Automata)
@@ -147,4 +150,6 @@ class Lexer:
     except SyntaxError as e:
       print(f'Error in line: {i+1}')
       print(e)
+      return None
+    res.append(Symbol("ENDMARK", ""))
     return res

@@ -52,6 +52,7 @@ BSHR >>
 POW **
 IDIV //
 EQ ==
+NEQ <>
 NEQ !=
 GEQT >=
 GT >
