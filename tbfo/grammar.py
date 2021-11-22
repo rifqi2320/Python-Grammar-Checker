@@ -68,11 +68,66 @@ class CFG(object):
             tes += 1
         self.is_cnf = True
         self.lines = result
+        
+def cyk(line,grammarcnf):
+    #convert the grammar cnf from a list of list format to a dictionary (hash table) format for cyk efficiency
+    dictrules = {}
+    for i in range(len(grammarcnf.lines)):
+        if grammarcnf.lines[i][0] not in dictrules.keys(): # to add the keys
+            dictrules[grammarcnf.lines[i][0]] = []
+        if len(grammarcnf.lines[i]) == 2: # format is Nonterminal -> Terminal
+            a = grammarcnf.lines[i][1] 
+            dictrules[grammarcnf.lines[i][0]].append([a]) 
+        elif len(grammarcnf.lines[i]) == 3: # format is Nonterminal -> Terminal
+            a = grammarcnf.lines[i][1] 
+            b = grammarcnf.lines[i][2] 
+            dictrules[grammarcnf.lines[i][0]].append([a,b]) 
+        n = len(line)
+        
+    print(dictrules) # TO TEST THE NEW DICT OF RULES
+      
+    # Initialize the table
+    T = [[set([]) for j in range(n)] for i in range(n)]
+  
+    # Filling in the table
+    for j in range(0, n):
+  
+        # Iterate over the rules
+        for lhs, rule in dictrules.items():
+            for rhs in rule:
+                  
+                # If a terminal is found
+                if len(rhs) == 1 and \
+                rhs[0] == line[j]:
+                    T[j][j].add(lhs)
+
+        for i in range(j, -1, -1):   
+               
+            # Iterate over the range i to j + 1   
+            for k in range(i, j + 1):     
+  
+                # Iterate over the rules
+                for lhs, rule in dictrules.items():
+                    for rhs in rule:
+                          
+                        # If a terminal is found
+                        if len(rhs) == 2 and \
+                        rhs[0] in T[i][k] and \
+                        rhs[1] in T[k + 1][j]:
+                            T[i][j].add(lhs)
+    # If word can be formed by rules 
+    # of given grammar
+    if len(T[0][n-1]) != 0:
+        print("Accepted")
+    else:
+        print("Rejected")
 
 if __name__ == "__main__":
     from pathlib import Path
-    g = CFG(Path(Path(__file__).parent, "examples", "python-cfgrevised.txt"))
-    g.to_cnf()
-    for i in range (len(g.lines)):
-        print(g.lines[i])
-    print(len(g.lines))
+    grammarcnf = CFG(Path(Path(__file__).parent, "examples", "python-cfgrevised.txt"))
+    grammarcnf.to_cnf()
+    for i in range (len(grammarcnf.lines)):
+        print(grammarcnf.lines[i])
+    print(len(grammarcnf.lines))
+    w = "NAME ASSIGN NUMBER ENDMARK".split()
+    cyk(w,grammarcnf) #gatau cara ngetesnya bener gini atau enggak, tapi hasilnya dapet rejected hiks
