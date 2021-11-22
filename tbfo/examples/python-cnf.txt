@@ -1,0 +1,1045 @@
+Start -> NLStmt H0
+| ENDMARK
+AugAssign -> ADDA
+| SUBA
+| MULA
+| MATMULA
+| DIVA
+| MODA
+| BANDA
+| BORA
+| BXORA
+| BSHLA
+| BSHRA
+| POWA
+| IDIVA
+CompOp -> LT
+| GT
+| EQ
+| GEQT
+| LEQT
+| NEQ
+| IN
+| H1 H2
+| IS
+| H3 H1
+TermOp -> MUL
+| MATMUL
+| DIV
+| MOD
+| IDIV
+ArithOp -> ADD
+| SUB
+FactorOp -> TILDE
+| ADD
+| SUB
+ShiftOp -> SHR
+| SHL
+MString -> STRING
+| MString H4
+Atom -> H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+DotEllipsis -> DOT
+| ELLIPSIS
+DotName -> NAME
+| H15 H14
+DotAsName -> H16 H14
+| NAME
+| H15 H14
+DotAsNames -> H17 DotAsNames
+| H16 H14
+| NAME
+| H15 H14
+DotEllipsisName -> DotEllipsis DotEllipsisName
+| NAME
+| H15 H14
+DotEllipsisOneM -> DotEllipsis DotEllipsisOneM
+| DOT
+| ELLIPSIS
+FromExpr -> DotEllipsis DotEllipsisName
+| NAME
+| H15 H14
+| DotEllipsis DotEllipsisOneM
+| DOT
+| ELLIPSIS
+ImportAsName -> NAME
+| H18 H14
+MImportAsNames -> H19 MImportAsNames
+| H20 ImportAsName
+ImportAsNames -> ImportAsName MImportAsNames
+| H21 H20
+| ImportAsName H20
+| NAME
+| H18 H14
+ImportExpr -> MUL
+| H22 H5
+| ImportAsName MImportAsNames
+| H21 H20
+| ImportAsName H20
+| NAME
+| H18 H14
+AtomTrail -> H23 H7
+| H24 H14
+| H11 H5
+| H25 H5
+MAtomTrail -> AtomTrail MAtomTrail
+| H23 H7
+| H24 H14
+| H11 H5
+| H25 H5
+AtomExpr -> Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+Factor -> FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+Term -> H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+ArithExpr -> H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+ShiftExpr -> H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+AndExpr -> H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+XorExpr -> H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+Expr -> H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+Comparison -> H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+NotTest -> H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+AndTest -> H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+OrTest -> H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+Test -> H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+MTests -> H20 Test
+Tests -> Test MTests
+| H39 H20
+| Test H20
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+TestStarExpr -> H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| H40 Expr
+TestsStarExpr -> TestStarExpr MTestsStarExpr
+| H42 H20
+| TestStarExpr H20
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| H40 Expr
+MTestsStarExpr -> H43 MTestsStarExpr
+| H20 TestStarExpr
+TestsStarExprStmt -> H44 TestsStarExprStmt
+| H45 TestsStarExpr
+EStarExpr -> H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| H40 Expr
+MEStarExpr -> H46 MEStarExpr
+| H20 EStarExpr
+Exprs -> EStarExpr MEStarExpr
+| H47 H20
+| EStarExpr H20
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| H40 Expr
+TestDStarExpr -> H49 Test
+| H48 Expr
+MTestDStarExpr -> H50 MTestDStarExpr
+| H20 TestDStarExpr
+Params -> H11 H5
+| H25 H5
+ClassParams -> H11 H5
+| H25 H5
+Args -> Arg MArgs
+| H51 H20
+| Arg H20
+| NAME
+| H14 CompFor
+| H52 H14
+| H48 H14
+| H40 H14
+MArgs -> H53 MArgs
+| H20 Args
+Arg -> NAME
+| H14 CompFor
+| H52 H14
+| H48 H14
+| H40 H14
+List -> TestStarExpr CompFor
+| TestStarExpr MTestsStarExpr
+| H42 H20
+| TestStarExpr H20
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| H40 Expr
+DictSet -> TestDStarExpr DictMake
+| H49 Test
+| H48 Expr
+| H54 SetMake
+| TestStar
+DictMake -> MTestDStarExpr H20
+| COMMA
+| H55 OrTest
+| H56 CompList
+| H50 MTestDStarExpr
+| H20 TestDStarExpr
+SetMake -> MTestsStarExpr H20
+| COMMA
+| H55 OrTest
+| H56 CompList
+| H43 MTestsStarExpr
+| H20 TestStarExpr
+SubList -> Sub MSub
+| H57 H20
+| Sub H20
+| Slice SliceTwo
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| COLON
+| Test H58
+| H58 Test
+| H49 Test
+MSub -> H59 MSub
+| H20 Sub
+Sub -> Slice SliceTwo
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| COLON
+| Test H58
+| H58 Test
+| H49 Test
+Slice -> COLON
+| Test H58
+| H58 Test
+| H49 Test
+SliceTwo -> COLON
+| H58 Test
+CompList -> H55 OrTest
+| H56 CompList
+| H60 OrTest
+| H61 CompList
+CompFor -> H55 OrTest
+| H56 CompList
+NLStmt -> H62 NLStmt
+| Stmt NLStmt
+| NL
+| H63 Section
+| H64 Section
+| H65 Section
+| H66 Section
+| H67 Section
+| SmallStmt H62
+| H68 H62
+| H69 H62
+| H70 H62
+| H71 Section
+| H72 Section
+| H73 H74
+| H73 With
+| H73 For
+| H75 Elif
+| H76 Else
+| H77 Section
+| H75 Else
+| H78 Section
+Stmt -> SmallStmt H62
+| H68 H62
+| H69 H62
+| H70 H62
+| H75 Elif
+| H76 Else
+| H77 Section
+| H75 Else
+| H71 Section
+| H72 Section
+| H78 Section
+| H73 H74
+| H73 With
+| H73 For
+| H63 Section
+| H64 Section
+| H66 Section
+| H67 Section
+| H65 Section
+MStmt -> Stmt MStmt
+| SmallStmt H62
+| H68 H62
+| H69 H62
+| H70 H62
+| H75 Elif
+| H76 Else
+| H77 Section
+| H75 Else
+| H71 Section
+| H72 Section
+| H78 Section
+| H73 H74
+| H73 With
+| H73 For
+| H63 Section
+| H64 Section
+| H66 Section
+| H67 Section
+| H65 Section
+SimpleStmt -> SmallStmt H62
+| H68 H62
+| H69 H62
+| H70 H62
+MultiSimpleStmt -> H79 MultiSimpleStmt
+| H80 SimpleStmt
+SmallStmt -> PASS
+| H41 Tests
+| TestsStarExpr TestsStarExprStmt
+| TestStarExpr MTestsStarExpr
+| H42 H20
+| TestStarExpr H20
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+| BREAK
+| CONTINUE
+| H40 Expr
+| RETURN
+| H81 Tests
+| H82 DotAsNames
+| RAISE
+| H83 Test
+| H84 Test
+| H85 ImportExpr
+Section -> H62 MStmt
+| SmallStmt H62
+| H68 H62
+| H69 H62
+| H70 H62
+Elif -> H86 Elif
+| H87 Section
+Else -> H88 Section
+For -> H71 Section
+| H72 Section
+With -> H65 Section
+WithExpr -> H89 WithItem
+| H90 Expr
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+WithItem -> H90 Expr
+| H38 Test
+| H37 AndTest
+| H36 NotTest
+| H1 NotTest
+| H35 Expr
+| H34 XorExpr
+| H33 AndExpr
+| H32 ShiftExpr
+| H31 ArithExpr
+| H30 Term
+| H29 Factor
+| FactorOp Factor
+| H28 Factor
+| Atom MAtomTrail
+| H26 MAtomTrail
+| H27 Atom
+| H6 H5
+| H8 H7
+| H10 H9
+| NAME
+| NUMBER
+| ELLIPSIS
+| NONE
+| TRUE
+| FALSE
+| H11 H5
+| H12 H7
+| H13 H9
+| STRING
+| MString H4
+H0 -> ENDMARK
+H1 -> NOT
+H2 -> IN
+H3 -> IS
+H4 -> String
+H5 -> RP
+H6 -> H11 List
+H7 -> RB
+H8 -> H12 List
+H9 -> RC
+H10 -> H13 DictSet
+H11 -> LP
+H12 -> LB
+H13 -> LC
+H14 -> NAME
+H15 -> DotName H24
+H16 -> DotName H91
+H17 -> DotAsName H20
+H18 -> H14 H91
+H19 -> H20 ImportAsName
+H20 -> COMMA
+H21 -> ImportAsName MImportAsNames
+H22 -> H11 ImportAsNames
+H23 -> H12 SubList
+H24 -> DOT
+H25 -> H11 Args
+H26 -> H27 Atom
+H27 -> AWAIT
+H28 -> AtomExpr H48
+H29 -> Term TermOp
+H30 -> ArithExpr ArithOp
+H31 -> ShiftExpr ShiftOp
+H32 -> AndExpr H92
+H33 -> XorExpr H93
+H34 -> Expr H94
+H35 -> Comparison CompOp
+H36 -> AndTest H95
+H37 -> OrTest H96
+H38 -> H98 H97
+H39 -> Test MTests
+H40 -> MUL
+H41 -> TestsStarExpr AugAssign
+H42 -> TestStarExpr MTestsStarExpr
+H43 -> H20 TestStarExpr
+H44 -> H45 TestsStarExpr
+H45 -> ASSIGN
+H46 -> H20 EStarExpr
+H47 -> EStarExpr MEStarExpr
+H48 -> POW
+H49 -> Test H58
+H50 -> H20 TestDStarExpr
+H51 -> Arg MArgs
+H52 -> H14 H45
+H53 -> H20 Args
+H54 -> TestStar
+H55 -> H99 H2
+H56 -> H55 OrTest
+H57 -> Sub MSub
+H58 -> COLON
+H59 -> H20 Sub
+H60 -> IF
+H61 -> H60 OrTest
+H62 -> NL
+H63 -> H100 H58
+H64 -> H101 H58
+H65 -> H102 H58
+H66 -> H103 H58
+H67 -> H104 H58
+H68 -> SmallStmt H105
+H69 -> SmallStmt MultiSimpleStmt
+H70 -> H69 H105
+H71 -> H106 H58
+H72 -> H107 H58
+H73 -> ASYNC
+H74 -> FunDef
+H75 -> H77 Section
+H76 -> H75 Elif
+H77 -> H108 H58
+H78 -> H109 H58
+H79 -> H80 SimpleStmt
+H80 -> H105 SmallStmt
+H81 -> RETURN
+H82 -> IMPORT
+H83 -> RAISE
+H84 -> H111 H110
+H85 -> H112 H82
+H86 -> H87 Section
+H87 -> H113 H58
+H88 -> H97 H58
+H89 -> WithExpr H20
+H90 -> Test H91
+H91 -> AS
+H92 -> BAND
+H93 -> XOR
+H94 -> BOR
+H95 -> AND
+H96 -> OR
+H97 -> ELSE
+H98 -> H114 OrTest
+H99 -> H115 Exprs
+H100 -> H116 Test
+H101 -> H117 H97
+H102 -> H118 WithExpr
+H103 -> H104 ClassParams
+H104 -> H119 H14
+H105 -> SEMICOLON
+H106 -> H55 Tests
+H107 -> H120 H97
+H108 -> H60 Test
+H109 -> H121 Params
+H110 -> FROM
+H111 -> H83 Test
+H112 -> H110 FromExpr
+H113 -> H122 Test
+H114 -> OrTest H60
+H115 -> FOR
+H116 -> WHILE
+H117 -> H63 Section
+H118 -> WITH
+H119 -> CLASS
+H120 -> H71 Section
+H121 -> H123 H14
+H122 -> ELIF
+H123 -> DEF
