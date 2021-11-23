@@ -221,8 +221,9 @@ class Lexer:
             line.pop(j)
 
       if res:
-        if str(res[-1][-1]) != "NL":
-          res[-1].append(Symbol("NL", "\n"))
+        for k in range(len(res)):
+          if str(res[k][-1]) != "NL":
+            res[k].append(Symbol("NL", "\n"))
 
       # If multiline comments arent terminated
       if (self.comment_flag):
