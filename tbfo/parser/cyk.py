@@ -30,7 +30,8 @@ def kaliSilang(kiri , kanan):
     return hasil
 
 # ALGORITMA YANG DIGUNAKAN PERSIS SESUAI DENGAN PSEUDOCODE PADA WIKIPEDIA
-def cyk(variables,terminals, lexer): 
+# Parameter cetak adalah boolean, bebas ingin mencetak atau tidak.
+def cyk(variables,terminals, lexer,cetak): 
     tabel = [[[] for j in range(len(lexer)-i)] for i in range(len(lexer))] # INISIALISASI TABEL UNTUK CYK, ISINYA BERUPA LIST
 
     # INI UNTUK MENGISI LEVEL PERTAMA DARI TABEL
@@ -48,28 +49,24 @@ def cyk(variables,terminals, lexer):
                     for m in range (len(variables)): #m adalah iterasi untuk mencari di variables apakah ada
                         if variables[m][1:] == hasil[l] :
                             tabel[i][j].append(variables[m][0]) # Kalau hasil kali silang ada di variables, langsung gas isi pada tabel
+    if cetak: #APABILA INGIN DICETAK
+        for i in range(len(lexer)):
+            print("\t" + str(lexer[i]), end="\t") # UNTUK MENCETAK TIAP TOKEN
+        print()
+        for i in range(len(lexer)): # ITERASI UNTUK TIAP BARIS PADA TABEL
+            print(i+1, end="")
+            for j in range(len(tabel[i])): # ITERASI UNTUK TIAP KOLOM PADA TABEL
+                print("\t" + str(tabel[i][j]), end="\t")
+            print()
+
+        if 'Start' in tabel[len(lexer)-1][0]: # Mengecek apakah start terkandung di paling bawah (kotak full sequence) atau tidak.
+            print("CONGRATS MOM YOU DID IT!")
+        else:
+            print("Rejected")
+        
     return tabel
 
-def show_result(tab, inp): # DA REAL MVP FOR DEBUGGING!
-    for c in inp:
-        print("\t{}".format(c), end="\t")
-    print()
-    for i in range(len(inp)):
-        print(i+1, end="")
-        for c in tab[i]:
-            if c == []:
-                print("\t{}".format("_"), end="\t")
-            else:
-                print("\t{}".format(c), end=" ")
-        print()
-
-    if 'Start' in tab[len(inp)-1][0]:
-        print("CONGRATS MOM YOU DID IT!")
-    else:
-        print("Rejected")
-
 if __name__ == "__main__":
-    variables, terminals = readgrammar("./tbfo/examples/python-cnf.txt")
+    variables, terminals = readgrammar("./grammer-empymaker.txt")
     lexer = "FROM NAME DOT NAME DOT NAME IMPORT NAME NL ENDMARK".split()
-    tabel = cyk(variables, terminals, lexer)
-    show_result(tabel, lexer)
+    tabel = cyk(variables, terminals, lexer,True)
