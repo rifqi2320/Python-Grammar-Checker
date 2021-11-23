@@ -13,14 +13,25 @@ args = args.parse_args()
 lex = Lexer(args.token_file)
 grammar = CFG(args.grammar_file)
 grammar.to_cnf()
+vars, terms = grammar.get_cyk_form
 
 with open(args.file, "r") as f:
     text = f.readlines()
-res = [
-    str(x)
-    for x in lex.lex_lines(text)
-]
-print(res[:-1])
-vars, terms = grammar.get_cyk_form
-print(vars,terms)
-cyk(vars, terms, res[:-1], True)
+res = lex.lex_lines(text)
+if res:
+    res = ' '.join([
+        str(line)
+        for x in res
+        for line in x
+    ]).split(' NL ')
+    res = [
+        x + ' NL' if x != 'NL' else x
+        for x in res
+    ]
+    res = [
+        x.split(' ')
+        for x in res
+    ]
+    print(res)
+    for line in res:
+        cyk(vars, terms, line, args.verbose)

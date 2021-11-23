@@ -109,10 +109,10 @@ class CFG(object):
         for k, prods in self.productions.items():
             for prod in prods:
                 if len(prod) == 1 and prod[0].isupper():
-                    prod_vars.append([k, prod[0]])
+                    prod_terms.append([k, prod[0]])
                 else:
                     if len(prod) == 2 and not prod[0].isupper() and not prod[1].isupper():
-                        prod_terms.append([k, prod[0], prod[1]])
+                        prod_vars.append([k, prod[0], prod[1]])
                     else:
                         raise SyntaxError(
                             f"Grammar has invalid productions (not in CNF): {prod}"

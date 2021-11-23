@@ -58,11 +58,10 @@ def cyk(variables,terminals, lexer,cetak):
             for j in range(len(tabel[i])): # ITERASI UNTUK TIAP KOLOM PADA TABEL
                 print("\t" + str(tabel[i][j]), end="\t")
             print()
-
-        if 'Start' in tabel[len(lexer)-1][0]: # Mengecek apakah start terkandung di paling bawah (kotak full sequence) atau tidak.
-            print("CONGRATS MOM YOU DID IT!")
-        else:
-            print("Rejected")
+    if 'Start' in tabel[len(lexer)-1][0]: # Mengecek apakah start terkandung di paling bawah (kotak full sequence) atau tidak.
+        print("Accepted")
+    else:
+        raise SyntaxError("Error when parsing grammar")
         
     return tabel
 
