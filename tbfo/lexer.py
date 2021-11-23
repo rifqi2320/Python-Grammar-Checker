@@ -40,9 +40,6 @@ class Lexer:
         else:
           self.keywords.append(Symbol(temp[0], temp[1]))
     
-          
-
-
     # Helper (Finite Automata)
     self.varCheck = VariableChecker()
 
@@ -184,7 +181,6 @@ class Lexer:
           else:
             raise SyntaxError(f"Indentation Error")
 
-        
         if indent < len(temp):
           # Check keyword that need flags
           if (str(temp[indent]) == "ELIF"):
@@ -215,13 +211,16 @@ class Lexer:
             function_flag.append(indent)
         
 
-        res += temp
+        res.append(temp)
 
       # Clean all spaces
-      for i in range(len(res) - 1, -1, -1):
-        if (type(res[i]) == Symbol and str(res[i]) == "SPACE"):
-          res.pop(i)
-      
+      for line in res:
+        for i in range(len(line) - 1, -1, -1):
+          if (type(line[i]) == Symbol and str(line[i]) == "SPACE"):
+            line.pop(i)
+      if res:
+        res[-1].append(Symbol("NL", "\n"))
+
       # If multiline comments arent terminated
       if (self.comment_flag):
           raise SyntaxError(f"Unterminated multiline comments.")
@@ -230,7 +229,6 @@ class Lexer:
       print(e)
       print(f'"{lines[i].strip()}"')
       return None
-    res.append(Symbol("ENDMARK", ""))
     return res
 
 if __name__ == '__main__':
@@ -241,7 +239,8 @@ if __name__ == '__main__':
   for line in lines:
     print(line, end='')
   print()
-  for a in res:
-    print(a,end=' ')
-    if (str(a) == "NL"):
-      print()
+  for line in res:
+    for a in line:
+      print(str(a), end=' ')
+      if (str(a) == "NL"):
+        print()
