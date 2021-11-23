@@ -1,7 +1,7 @@
 import argparse
 from tbfo.grammar import CFG
 from tbfo.lexer import Lexer
-from tbfo.parser.cyk import cyk
+from tbfo.parser.cyk import CYK
 
 args = argparse.ArgumentParser()
 args.add_argument("file", help="path to the file input you want to check")
@@ -13,19 +13,27 @@ args = args.parse_args()
 lex = Lexer(args.token_file)
 grammar = CFG(args.grammar_file)
 grammar.to_cnf()
-vars, terms = grammar.get_cyk_form
+parser = CYK(grammar, args.verbose)
 
 with open(args.file, "r") as f:
     text = f.readlines()
-res = lex.lex_lines(text)
-if res:
-    res = [
+inp = lex.lex_lines(text)
+if inp:
+    inp = [
         [
             str(line)
             for line in x
         ]
-        for x in res
+        for x in inp
     ]
-    print(res)
-    for line in res:
-        cyk(vars, terms, line, args.verbose)
+    if args.verbose:
+        print(' '.join([' '.join(x) for x in inp]))
+    res = True
+    for i in range(len(inp)):
+        res = parser.parse(inp[i])
+        if not res:
+            print(f'Syntax Error in line: {i+1}')
+            print(f'"{text[i].strip()}"')
+            break
+    if res:
+        print("Syntax OK!")

@@ -1,72 +1,84 @@
+from tbfo.grammar import CFG
 
-# LOAD GRAMMAR DARI FILE TXT. Format dari grammarnya harus one liner, kalau ada | Maka harus ditulis dibawahnya.
-def readgrammar(filename):
-    nonterminals, terminals = [], [] # INI ITU LIST OF LIST, ISINYA ADALAH [VARIABEL,NONTERM,NONTERM] ATAU [VARIABEL,TERM] UNTUK MEMPERMUDAH PROSES SEARCHING NANTI
-    with open(filename) as f:
-        lines = f.readlines()
-    for line in lines :
-        if line[0] != '|' : # INI KASUS START DARI SEBUAH VARIABEL, MISALNYA A -> B
-            sementara = line.replace("->", "").split()
-            nonterminal = sementara[0]
-            if len(sementara) == 2 :
-                terminals.append(sementara)
-            elif len(sementara) == 3:
-                nonterminals.append(sementara)
-        else : # INI KASUS KALAU AWALNYA |
-            buangawal = line[2:]
-            tambahan = buangawal.split()
-            if len(tambahan) == 1:
-                terminals.append([nonterminal, tambahan[0]])
-            elif len(tambahan) == 2:
-                nonterminals.append([nonterminal, tambahan[0], tambahan[1]])
-    return nonterminals, terminals
+class CYK:
+    def __init__(self, grammar: CFG, verbose=False) -> None:
+        self.grammar = grammar
+        (
+            variables,
+            self.terminals
+        ) = self.grammar.get_cyk_form
+        variables_cache = {}
+        for prod in variables:
+            h = ' '.join(prod[1:])
+            if h not in variables_cache:
+                variables_cache[h] = []
+            variables_cache[h].append(prod[0])
+        self.variables_cache = variables_cache
+        self.verbose = verbose
+    
+    # ALGORITMA PERKALIAN SILANG, MISALNYA NON
+    # TERMINAL A B*C D JADINYA AC AD BC BD.
+    # Digunakan untuk mengisi / mengecek kotak pada tabel CYK
+    @staticmethod
+    def kali_silang(kiri, kanan):
+        return [
+            [l, r]
+            for l in kiri
+            for r in kanan
+        ]
 
-# ALGORITMA PERKALIAN SILANG, MISALNYA NON TERMINAL A B*C D JADINYA AC AD BC BD. digunakan untuk mengisi / mengecek kotak pada tabel CYK
-def kaliSilang(kiri , kanan):
-    hasil = []
-    for i in range (len(kiri)):
-        for j in range(len(kanan)):
-            if [kiri[i],kanan[j]] not in hasil:
-                hasil.append([kiri[i],kanan[j]])
-    return hasil
+    def parse(self, tokens):
+        # INISIALISASI TABEL UNTUK CYK, ISINYA BERUPA LIST
+        tabel = [
+            [ [] for _ in range(len(tokens)-i) ]
+            for i in range(len(tokens))
+        ]
 
-# ALGORITMA YANG DIGUNAKAN PERSIS SESUAI DENGAN PSEUDOCODE PADA WIKIPEDIA
-# Parameter cetak adalah boolean, bebas ingin mencetak atau tidak.
-def cyk(variables,terminals, lexer,cetak): 
-    tabel = [[[] for j in range(len(lexer)-i)] for i in range(len(lexer))] # INISIALISASI TABEL UNTUK CYK, ISINYA BERUPA LIST
+        # INI UNTUK MENGISI LEVEL PERTAMA DARI TABEL
+        for i in range(len(tokens)):
+            for term in self.terminals:
+                # Kalau tokens ke-i ketemu di terminal,
+                # langsung gas isi pada tabel level pertama
+                if (
+                    tokens[i] == term[1]
+                    and term[0] not in tabel[0][i]
+                ):
+                    tabel[0][i].append(term[0])
 
-    # INI UNTUK MENGISI LEVEL PERTAMA DARI TABEL
-    for i in range(len(lexer)):
-        for j in range (len(terminals)):
-            if lexer[i] == terminals[j][1] and terminals[j][0] not in tabel[0][i] : # Kalau lexer ke-i ketemu di terminal, langsung gas isi pada tabel level pertama
-                tabel[0][i].append(terminals[j][0])
-                
-    # INI UNTUK MENGISI LEVEL SISANYA DARI TABEL
-    for i in range(1,len(lexer)): # i adalah iterasi untuk tiap level pada tabel
-        for j in range(len(lexer) - i): # j adalah iterasi untuk tiap kolom pada tabel
-            for k in range(i): # k adalah iterasi untuk banyaknya pengecekan/kali silang untuk tiap pengisian kotak pada tabel
-                hasil = kaliSilang(tabel[k][j], tabel[i-k-1][j+k+1])
-                for l in range(len(hasil)): # l adalah iterasi untuk tiap hasil kali silang
-                    for m in range (len(variables)): #m adalah iterasi untuk mencari di variables apakah ada
-                        if variables[m][1:] == hasil[l] and variables[m][0] not in tabel[i][j]:
-                            tabel[i][j].append(variables[m][0]) # Kalau hasil kali silang ada di variables, langsung gas isi pada tabel
-    if cetak: #APABILA INGIN DICETAK
-        for i in range(len(lexer)):
-            print("\t" + str(lexer[i]), end="\t") # UNTUK MENCETAK TIAP TOKEN
-        print()
-        for i in range(len(lexer)): # ITERASI UNTUK TIAP BARIS PADA TABEL
-            print(i+1, end="")
-            for j in range(len(tabel[i])): # ITERASI UNTUK TIAP KOLOM PADA TABEL
-                print("\t" + str(tabel[i][j]), end="\t")
+        # INI UNTUK MENGISI LEVEL SISANYA DARI TABEL
+        # i adalah iterasi untuk tiap level pada tabel
+        for i in range(1,len(tokens)):
+            # j adalah iterasi untuk tiap kolom pada tabel
+            for j in range(len(tokens) - i):
+                # k adalah iterasi untuk banyaknya pengecekan/kali
+                # silang untuk tiap pengisian kotak pada tabel
+                for k in range(i):
+                    hasil = self.kali_silang(
+                        tabel[k][j],
+                        tabel[i-k-1][j+k+1],
+                    )
+                    for h in hasil: # h adalah iterasi untuk tiap hasil kali silang
+                        h = ' '.join(h)
+                        if h in self.variables_cache:
+                            if self.variables_cache[h] not in tabel[i][j]:
+                                # Kalau hasil kali silang ada di variables,
+                                # langsung gas isi pada tabel
+                                tabel[i][j] = [
+                                    *tabel[i][j],
+                                    *self.variables_cache[h]
+                                ]
+        # APABILA INGIN DICETAK
+        if self.verbose: 
+            for t in tokens:
+                # UNTUK MENCETAK TIAP TOKEN
+                print("\t" + str(t), end="\t")
             print()
-    if 'Start' in tabel[len(lexer)-1][0]: # Mengecek apakah start terkandung di paling bawah (kotak full sequence) atau tidak.
-        print("Accepted")
-    else:
-        raise SyntaxError("Error when parsing grammar")
-        
-    return tabel
+            for i in range(len(tokens)): # ITERASI UNTUK TIAP BARIS PADA TABEL
+                print(i + 1, end="")
+                for j in range(len(tabel[i])): # ITERASI UNTUK TIAP KOLOM PADA TABEL
+                    print("\t" + str(tabel[i][j]), end="\t")
+                print()
 
-if __name__ == "__main__":
-    variables, terminals = readgrammar("./grammer-empymaker.txt")
-    lexer = "FROM NAME DOT NAME DOT NAME IMPORT NAME NL ENDMARK".split()
-    tabel = cyk(variables, terminals, lexer,True)
+        # Mengembalikan apakah start terkandung di paling bawah
+        # (kotak full sequence) / accepted atau tidak / rejected
+        return self.grammar.start_variable in tabel[len(tokens)-1][0]

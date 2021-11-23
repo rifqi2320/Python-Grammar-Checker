@@ -1,1 +1,35 @@
-x = njir(1,2)
+
+
+ASSIGN = 2
+BRUH = 2
+
+
+
+
+ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;ASSIGN = 2; BRUH = 2; NJIR = 3; MONKAS = 5;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

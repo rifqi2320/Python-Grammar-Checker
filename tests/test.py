@@ -1,11 +1,12 @@
 def do_something(x):
   ''' This is a sample multiline comment
   '''
-  x + 2 = 3
   if x == 0 + 1:
     return 0
   elif x + 4 == 1:
-    return 5
+    return None
+  elif x:
+    print("a")
   else:
     return 2
     """
@@ -14,4 +15,6 @@ def do_something(x):
   else:
     return "Doodoo"
     """
+  def bruh(x):
+    x[True or False if 1 == 2 else 3 and 4:1+None+3 and 5:None and False or True] = 5
     

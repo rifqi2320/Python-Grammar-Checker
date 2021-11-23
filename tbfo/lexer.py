@@ -229,7 +229,7 @@ class Lexer:
       if (self.comment_flag):
           raise SyntaxError(f"Unterminated multiline comments.")
     except SyntaxError as e:
-      print(f'Error in line: {i+1}')
+      print(f'Syntax Error in line: {i+1}')
       print(e)
       print(f'"{lines[i].strip()}"')
       return None
