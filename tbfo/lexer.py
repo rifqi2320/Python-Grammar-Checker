@@ -159,6 +159,7 @@ class Lexer:
       for i in range(len(lines)):
         temp = self.lex(lines[i])
         if not [x for x in temp if str(x) not in ["SPACE", "NL"]]:
+          res.append([Symbol("NL", "\n")])
           continue
         check = [x for x in temp if type(x) != Symbol]
         if (check):
@@ -220,7 +221,7 @@ class Lexer:
             line.pop(j)
 
       if res:
-        if str(res[-1]) != "NL":
+        if str(res[-1][-1]) != "NL":
           res[-1].append(Symbol("NL", "\n"))
 
       # If multiline comments arent terminated
@@ -242,7 +243,9 @@ if __name__ == '__main__':
     print(line, end='')
   print()
   for line in res:
+    print('[')
     for a in line:
       print(str(a), end=' ')
       if (str(a) == "NL"):
         print()
+    print(']')
