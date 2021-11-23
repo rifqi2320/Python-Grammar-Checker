@@ -147,13 +147,13 @@ class Lexer:
         res[i] = self.sym_NAME
     return res
 
-  def lex_lines(self,lines):
+  def lex_lines(self,lines, check_indent=True):
     res = []
     indentation = [0] # indentasi yang valid
     if_flag = [] # indentasi dimana ada if
     loop_flag = [] #indentasi dimana ada loop
     function_flag = [] #indentasi dimana ada fungsi
-    indent_flag = False
+    indent_flag = 0
     lines.append("\n")
     try:
       for i in range(len(lines)):
@@ -165,51 +165,51 @@ class Lexer:
           raise SyntaxError(f"Invalid variable : {','.join(check)}.")
         
         # Check Indentation
-        indent = 0
-        while (indent < len(temp) and type(temp[indent]) == Symbol and str(temp[indent]) == "SPACE"):
-          indent += 1
-        if indent_flag: 
-          if (indent > max(indentation)): # Indentation must increase
-            indentation.append(indent) 
-            indent_flag = False
+        if check_indent:
+          indent = 0
+          while (indent < len(temp) and type(temp[indent]) == Symbol and str(temp[indent]) == "SPACE"):
+            indent += 1
+          if indent_flag: 
+            if (indent > max(indentation)): # Indentation must increase
+              indentation.append(indent) 
+              indent_flag -= 1
+            else:
+              raise SyntaxError(f"Indentation Error")
           else:
-            raise SyntaxError(f"Indentation Error")
-        else:
-          if indent in indentation: # Indentation Valid
-            if (indent < len(temp) and str(temp[indent]) in self.keyword_INDENT): # Indentation flag raised
-              indent_flag = True
-          else:
-            raise SyntaxError(f"Indentation Error")
+            if indent not in indentation: # Indentation Tidak
+              raise SyntaxError(f"Indentation Error")
+          if (indent < len(temp) and str(temp[indent]) in self.keyword_INDENT): # Indentation flag raised
+            indent_flag += 1
 
-        if indent < len(temp):
-          # Check keyword that need flags
-          if (str(temp[indent]) == "ELIF"):
-            if (indent not in if_flag):
-              raise SyntaxError(f"Invalid Syntax")
-          elif (str(temp[indent]) == "ELSE"):
-            if (indent not in if_flag + loop_flag):
-              raise SyntaxError(f"Invalid Syntax")
-          elif (str(temp[indent]) == "RETURN"):
-            if indent < min(function_flag):
-              raise SyntaxError(f"Invalid Syntax")
-          elif (str(temp[indent]) in ["BREAK", "CONTINUE"]):
-            if (indent < min(loop_flag)):
-              raise SyntaxError(f"Invalid Syntax")
+          if indent < len(temp):
+            # Check keyword that need flags
+            if (str(temp[indent]) == "ELIF"):
+              if (indent not in if_flag):
+                raise SyntaxError(f"Invalid Syntax")
+            elif (str(temp[indent]) == "ELSE"):
+              if (indent not in if_flag + loop_flag):
+                raise SyntaxError(f"Invalid Syntax")
+            elif (str(temp[indent]) == "RETURN"):
+              if not function_flag or indent < min(function_flag):
+                raise SyntaxError(f"Invalid Syntax")
+            elif (str(temp[indent]) in ["BREAK", "CONTINUE"]):
+              if not loop_flag or indent < min(loop_flag):
+                raise SyntaxError(f"Invalid Syntax")
 
-          # Update Indentation
-          if_flag = [x for x in if_flag if x < indent]  
-          loop_flag = [x for x in loop_flag if x < indent]
-          function_flag = [x for x in function_flag if x < indent]
-          indentation = [x for x in indentation if x <= indent]
+            # Update Indentation
+            if_flag = [x for x in if_flag if x < indent]  
+            loop_flag = [x for x in loop_flag if x < indent]
+            function_flag = [x for x in function_flag if x < indent]
+            indentation = [x for x in indentation if x <= indent]
 
-          # Check flag raiser
-          if (str(temp[indent]) in ["IF", "ELIF"]):
-            if_flag.append(indent)
-          elif (str(temp[indent]) in ["FOR", "WHILE"]):
-            loop_flag.append(indent)
-          elif (str(temp[indent]) == "DEF"):
-            function_flag.append(indent)
-        
+            # Check flag raiser
+            if (str(temp[indent]) in ["IF", "ELIF"]):
+              if_flag.append(indent)
+            elif (str(temp[indent]) in ["FOR", "WHILE"]):
+              loop_flag.append(indent)
+            elif (str(temp[indent]) == "DEF"):
+              function_flag.append(indent)
+          
 
         res.append(temp)
 
@@ -218,8 +218,6 @@ class Lexer:
         for j in range(len(line) - 1, -1, -1):
           if (type(line[j]) == Symbol and str(line[j]) == "SPACE"):
             line.pop(j)
-      if res:
-        res[-1].append(Symbol("NL", "\n"))
 
       # If multiline comments arent terminated
       if (self.comment_flag):
