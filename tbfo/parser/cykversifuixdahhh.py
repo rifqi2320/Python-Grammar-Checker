@@ -21,8 +21,8 @@ def readgrammar(filename):
                 nonterminals.append([nonterminal, tambahan[0], tambahan[1]])
     return nonterminals, terminals
 
-# ALGORITMA PERKALIAN SILANG, MISALNYA AB*CD JADINYA AC AD BC BD. digunakan untuk mengisi / mengecek kotak pada tabel CYK
-def concatenateVariables(kiri , kanan):
+# ALGORITMA PERKALIAN SILANG, MISALNYA NON TERMINAL A B*C D JADINYA AC AD BC BD. digunakan untuk mengisi / mengecek kotak pada tabel CYK
+def kaliSilang(kiri , kanan):
     hasil = []
     for i in range (len(kiri)):
         for j in range(len(kanan)):
@@ -42,12 +42,12 @@ def cyk(variables,terminals, lexer):
     # INI UNTUK MENGISI LEVEL SISANYA DARI TABEL
     for i in range(1,len(lexer)): # i adalah iterasi untuk tiap level pada tabel
         for j in range(len(lexer) - i): # j adalah iterasi untuk tiap kolom pada tabel
-            for k in range(i): # k adalah iterasi untuk banyaknya pengecekan/konkatenasi untuk tiap pengisian kotak pada tabel
-                hasil = concatenateVariables(tabel[k][j], tabel[i-k-1][j+k+1])
-                for l in range(len(hasil)): # l adalah iterasi untuk tiap hasil konkatenasi
+            for k in range(i): # k adalah iterasi untuk banyaknya pengecekan/kali silang untuk tiap pengisian kotak pada tabel
+                hasil = kaliSilang(tabel[k][j], tabel[i-k-1][j+k+1])
+                for l in range(len(hasil)): # l adalah iterasi untuk tiap hasil kali silang
                     for m in range (len(variables)): #m adalah iterasi untuk mencari di variables apakah ada
                         if variables[m][1:] == hasil[l] :
-                            tabel[i][j].append(variables[m][0]) # Kalau hasil konkat ada di variables, langsung gas isi pada tabel
+                            tabel[i][j].append(variables[m][0]) # Kalau hasil kali silang ada di variables, langsung gas isi pada tabel
     return tabel
 
 def show_result(tab, inp): # DA REAL MVP FOR DEBUGGING!
@@ -70,6 +70,6 @@ def show_result(tab, inp): # DA REAL MVP FOR DEBUGGING!
 
 
 variables, terminals = readgrammar("./tbfo/examples/python-cnf.txt")
-lexer = "NAME LB NUMBER COLON COLON TRUE RB ASSIGN LB RB NL ENDMARK".split()
+lexer = "FROM NAME DOT NAME DOT NAME IMPORT NAME NL ENDMARK".split()
 tabel = cyk(variables, terminals, lexer)
 show_result(tabel, lexer)
