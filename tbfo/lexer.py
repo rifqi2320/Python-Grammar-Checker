@@ -1,5 +1,6 @@
 from tbfo.parser.fa import VariableChecker
 import os
+from pathlib import Path
 
 class Symbol:
   def __init__(self, name, symbol):
@@ -9,13 +10,18 @@ class Symbol:
   def __str__(self):
     return self.name
 
-
 class Lexer:
-  def __init__(self):
+  def __init__(self, filepath=None):
     self.symbols = []
     self.keywords = []
     self.whitespace = []
-    with open(os.path.dirname(os.path.realpath(__file__)) + "\\keyword.txt") as f:
+    if filepath is None:
+      filepath = Path(
+        Path(__file__).parent,
+        "examples",
+        "tokens.txt"
+      )
+    with open(filepath) as f:
       lines = f.readlines()
     flag = False
     for line in lines:

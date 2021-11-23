@@ -68,8 +68,8 @@ def show_result(tab, inp): # DA REAL MVP FOR DEBUGGING!
     else:
         print("Rejected")
 
-
-variables, terminals = readgrammar("./tbfo/examples/python-cnf.txt")
-lexer = "FROM NAME DOT NAME DOT NAME IMPORT NAME NL ENDMARK".split()
-tabel = cyk(variables, terminals, lexer)
-show_result(tabel, lexer)
+if __name__ == "__main__":
+    variables, terminals = readgrammar("./tbfo/examples/python-cnf.txt")
+    lexer = "FROM NAME DOT NAME DOT NAME IMPORT NAME NL ENDMARK".split()
+    tabel = cyk(variables, terminals, lexer)
+    show_result(tabel, lexer)
