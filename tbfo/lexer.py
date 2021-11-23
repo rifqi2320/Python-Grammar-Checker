@@ -89,7 +89,8 @@ class Lexer:
         res.pop(i)
       else:
         if (type(res[i]) == Symbol):
-          if (("TRIPLEQUOTE" in str([x for x in res if str(x) != "SPACE"][0])) or str(res[i]) == "HASHTAG"):
+          check = [x for x in res if str(x) != "SPACE"]
+          if (check and (("TRIPLEQUOTE" in str(check[0])) or str(res[i]) == "HASHTAG")):
             self.comment_flag = res[i]
             res.pop(i)
           else:
@@ -155,10 +156,11 @@ class Lexer:
     loop_flag = [] #indentasi dimana ada loop
     function_flag = [] #indentasi dimana ada fungsi
     indent_flag = False
+    lines.append("\n")
     try:
       for i in range(len(lines)):
         temp = self.lex(lines[i])
-        if not temp:
+        if not [x for x in temp if str(x) != "SPACE"]:
           continue
         check = [x for x in temp if type(x) != Symbol]
         if (check):
@@ -215,9 +217,9 @@ class Lexer:
 
       # Clean all spaces
       for line in res:
-        for i in range(len(line) - 1, -1, -1):
-          if (type(line[i]) == Symbol and str(line[i]) == "SPACE"):
-            line.pop(i)
+        for j in range(len(line) - 1, -1, -1):
+          if (type(line[j]) == Symbol and str(line[j]) == "SPACE"):
+            line.pop(j)
       if res:
         res[-1].append(Symbol("NL", "\n"))
 
