@@ -26,7 +26,8 @@ def kaliSilang(kiri , kanan):
     hasil = []
     for i in range (len(kiri)):
         for j in range(len(kanan)):
-            hasil.append([kiri[i],kanan[j]])
+            if [kiri[i],kanan[j]] not in hasil:
+                hasil.append([kiri[i],kanan[j]])
     return hasil
 
 # ALGORITMA YANG DIGUNAKAN PERSIS SESUAI DENGAN PSEUDOCODE PADA WIKIPEDIA
@@ -37,7 +38,7 @@ def cyk(variables,terminals, lexer,cetak):
     # INI UNTUK MENGISI LEVEL PERTAMA DARI TABEL
     for i in range(len(lexer)):
         for j in range (len(terminals)):
-            if lexer[i] == terminals[j][1]: # Kalau lexer ke-i ketemu di terminal, langsung gas isi pada tabel level pertama
+            if lexer[i] == terminals[j][1] and terminals[j][0] not in tabel[0][i] : # Kalau lexer ke-i ketemu di terminal, langsung gas isi pada tabel level pertama
                 tabel[0][i].append(terminals[j][0])
                 
     # INI UNTUK MENGISI LEVEL SISANYA DARI TABEL
@@ -47,7 +48,7 @@ def cyk(variables,terminals, lexer,cetak):
                 hasil = kaliSilang(tabel[k][j], tabel[i-k-1][j+k+1])
                 for l in range(len(hasil)): # l adalah iterasi untuk tiap hasil kali silang
                     for m in range (len(variables)): #m adalah iterasi untuk mencari di variables apakah ada
-                        if variables[m][1:] == hasil[l] :
+                        if variables[m][1:] == hasil[l] and variables[m][0] not in tabel[i][j]:
                             tabel[i][j].append(variables[m][0]) # Kalau hasil kali silang ada di variables, langsung gas isi pada tabel
     if cetak: #APABILA INGIN DICETAK
         for i in range(len(lexer)):
