@@ -50,6 +50,8 @@ class Lexer:
     self.sym_NUMBER = Symbol("NUMBER", "0-9")
     self.sym_NAME = Symbol("NAME", "var")
 
+    self.keyword_INDENT = ["IF", "ELIF", "ELSE", "FOR", "WHILE", "DEF", "CLASS", "WITH"]
+
   def lex(self, line):
     res = [line]
     # Tokenize symbol and whitespace
@@ -74,11 +76,6 @@ class Lexer:
     # Clean empty element
     res = [x for x in res if x]
 
-    # Clean all spaces
-    for i in range(len(res) - 1, -1, -1):
-      if (type(res[i]) == Symbol and str(res[i]) == "SPACE"):
-        res.pop(i)
-
     # Parse Comment (remove comments)
     i = 0
     self.comment_flag = None
@@ -91,7 +88,7 @@ class Lexer:
         res.pop(i)
       else:
         if (type(res[i]) == Symbol):
-          if (("TRIPLEQUOTE" in str(res[i]) and i == 0) or str(res[i]) == "HASHTAG"):
+          if (("TRIPLEQUOTE" in str([x for x in res if str(x) != "SPACE"][0])) or str(res[i]) == "HASHTAG"):
             self.comment_flag = res[i]
             res.pop(i)
           else:
@@ -150,19 +147,79 @@ class Lexer:
 
   def lex_lines(self,lines):
     res = []
+    indentation = [0] # indentasi yang valid
+    if_flag = [] # indentasi dimana ada if
+    loop_flag = [] #indentasi dimana ada loop
+    function_flag = [] #indentasi dimana ada fungsi
+    indent_flag = False
     try:
       for i in range(len(lines)):
         temp = self.lex(lines[i])
+        if not temp:
+          continue
         check = [x for x in temp if type(x) != Symbol]
         if (check):
           raise SyntaxError(f"Invalid variable : {','.join(check)}.")
+        
+        # Check Indentation
+        indent = 0
+        while (indent < len(temp) and type(temp[indent]) == Symbol and str(temp[indent]) == "SPACE"):
+          indent += 1
+        if indent_flag: # Indentation flag raised
+          if (indent > max(indentation)):
+            indentation.append(indent)
+            indent_flag = False
+          else:
+            raise SyntaxError(f"Indentation Error")
+        else:
+          if indent in indentation: # Indentation Valid
+            if (str(temp[indent]) in self.keyword_INDENT):
+              indent_flag = True
+          else:
+            raise SyntaxError(f"Indentation Error")
+
+        
+        if indent < len(temp):
+          # Check keyword that need flags
+          if (str(temp[indent]) == "ELIF"):
+            if (indent not in if_flag):
+              raise SyntaxError(f"Invalid Syntax")
+          elif (str(temp[indent]) == "ELSE"):
+            if (indent not in if_flag + loop_flag):
+              raise SyntaxError(f"Invalid Syntax")
+          elif (str(temp[indent]) == "RETURN"):
+            if indent < min(function_flag):
+              raise SyntaxError(f"Invalid Syntax")
+
+          # Update Indentation
+          if_flag = [x for x in if_flag if x < indent]  
+          loop_flag = [x for x in loop_flag if x < indent]
+          function_flag = [x for x in function_flag if x < indent]
+          indentation = [x for x in indentation if x <= indent]
+
+          # Check flag raiser
+          if (str(temp[indent]) in ["IF", "ELIF"]):
+            if_flag.append(indent)
+          elif (str(temp[indent]) in ["FOR", "WHILE"]):
+            loop_flag.append(indent)
+          elif (str(temp[indent]) == "DEF"):
+            function_flag.append(indent)
+        
+
         res += temp
+
+      # Clean all spaces
+      for i in range(len(res) - 1, -1, -1):
+        if (type(res[i]) == Symbol and str(res[i]) == "SPACE"):
+          res.pop(i)
+      
+      # If multiline comments arent terminated
       if (self.comment_flag):
           raise SyntaxError(f"Unterminated multiline comments.")
     except SyntaxError as e:
       print(f'Error in line: {i+1}')
       print(e)
-      print(lines[i])
+      print(f'"{lines[i].strip()}"')
       return None
     res.append(Symbol("ENDMARK", ""))
     return res
