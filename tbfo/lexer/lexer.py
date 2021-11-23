@@ -42,8 +42,6 @@ class Lexer:
 
     # Flags
     self.comment_flag = None
-    self.string_flag = None
-    self.number_flag = False
 
     # Constants
     self.sym_STRING = Symbol("STRING", '""')
@@ -97,49 +95,51 @@ class Lexer:
           i += 1
 
     # Parse Strings
-    self.string_flag = None
+    string_flag = None
     for i in range(len(res) - 1, -1, -1):
-      if (self.string_flag):
-        if (self.string_flag == res[i]):
+      if (string_flag):
+        if (string_flag == res[i]):
           res[i] = self.sym_STRING
-          self.string_flag = None
+          string_flag = None
         else:
           res.pop(i)
       else:
         if type(res[i]) == Symbol:
           if (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
-            self.string_flag = res[i]
+            string_flag = res[i]
             res.pop(i)
-    if self.string_flag:
-      self.string_flag = None
+    if string_flag:
+      string_flag = None
       raise SyntaxError("Unterminated String")
 
     # Parse Number
-    self.number_flag = False
+    number_flag = False
+    isFloat = False
     for i in range(len(res) - 1, -1, -1):
-      if self.number_flag:
+      if number_flag:
         if (type(res[i]) == Symbol):
-          if (str(res[i]) == "DOT"):
+          if (str(res[i]) == "DOT" and not isFloat):
             res.pop(i)
+            isFloat = True
           else:
             res.insert(i+1, self.sym_NUMBER)
-            self.number_flag = False
+            number_flag = False
         else:
           if (res[i].isnumeric()):
             res.pop(i)
           else:
             res.insert(i+1, self.sym_NUMBER)
-            self.number_flag = False
+            number_flag = False
       else:
         if (type(res[i]) == str):
           if (res[i].isnumeric()):
             res.pop(i)
-            self.number_flag = True
-    if self.number_flag:
-      self.number_flag = False
+            number_flag = True
+    if number_flag:
+      number_flag = False
       res.insert(0, self.sym_NUMBER)
 
-    
+    # Evaluasi Variable
     for i in range(len(res)):
       if (type(res[i]) == str and self.varCheck.check(res[i])):
         res[i] = self.sym_NAME
@@ -165,15 +165,15 @@ class Lexer:
         indent = 0
         while (indent < len(temp) and type(temp[indent]) == Symbol and str(temp[indent]) == "SPACE"):
           indent += 1
-        if indent_flag: # Indentation flag raised
-          if (indent > max(indentation)):
-            indentation.append(indent)
+        if indent_flag: 
+          if (indent > max(indentation)): # Indentation must increase
+            indentation.append(indent) 
             indent_flag = False
           else:
             raise SyntaxError(f"Indentation Error")
         else:
           if indent in indentation: # Indentation Valid
-            if (str(temp[indent]) in self.keyword_INDENT):
+            if (indent < len(temp) and str(temp[indent]) in self.keyword_INDENT): # Indentation flag raised
               indent_flag = True
           else:
             raise SyntaxError(f"Indentation Error")
@@ -189,6 +189,9 @@ class Lexer:
               raise SyntaxError(f"Invalid Syntax")
           elif (str(temp[indent]) == "RETURN"):
             if indent < min(function_flag):
+              raise SyntaxError(f"Invalid Syntax")
+          elif (str(temp[indent]) in ["BREAK", "CONTINUE"]):
+            if (indent < min(loop_flag)):
               raise SyntaxError(f"Invalid Syntax")
 
           # Update Indentation

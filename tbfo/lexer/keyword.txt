@@ -34,6 +34,18 @@ IN in
 
 SYMBOL
 
+# Logical Operator
+EQ ==
+NEQ <>
+NEQ !=
+GEQT >=
+GT >
+LEQT <=
+LT <
+TRIPLEQUOTE2 """
+TRIPLEQUOTE1 '''
+HASHTAG #
+
 # Assignment (+ Augmented)
 ASSIGN =
 ADDA +=
@@ -64,18 +76,6 @@ BSHL <<
 BSHR >>
 POW **
 IDIV //
-
-# Logical Operator
-EQ ==
-NEQ <>
-NEQ !=
-GEQT >=
-GT >
-LEQT <=
-LT <
-TRIPLEQUOTE2 """
-TRIPLEQUOTE1 '''
-HASHTAG #
 
 # Misc
 QUOTE2 "
