@@ -1,3 +1,5 @@
+from pathlib import Path
+
 class CFG(object):
     def __init__(self, filename=None):
         self.is_cnf = False
@@ -100,12 +102,22 @@ class CFG(object):
     def terminals(self):
         return self._terminals
 
-    def _apply_transform(self, cond_fun, trans_fun):
-        for v in self.productions:
-            for i in range(self.productions[v]):
-                if cond_fun(v, i):
-                    trans_fun(v, i)
-                    break
+    @property
+    def get_cyk_form(self):
+        prod_vars = []
+        prod_terms = []
+        for k, prods in self.productions.items():
+            for prod in prods:
+                if len(prod) == 1 and prod[0].isupper():
+                    prod_vars.append([k, prod[0]])
+                else:
+                    if len(prod) == 2 and not prod[0].isupper() and not prod[1].isupper():
+                        prod_terms.append([k, prod[0], prod[1]])
+                    else:
+                        raise SyntaxError(
+                            f"Grammar has invalid productions (not in CNF): {prod}"
+                        )
+        return prod_vars, prod_terms
 
     def to_cnf(self):
         grammar = self.productions
@@ -282,10 +294,10 @@ class CFG(object):
         self.is_cnf = True
 
 if __name__ == "__main__":
-    from pathlib import Path
     grammarcnf = CFG()
-    with open("python-clean.txt", "w+") as f:
+    parent = Path(Path(__file__).parent, "grammar")
+    with open(Path(parent, "python-clean.txt"), "w+") as f:
         f.write(str(grammarcnf))
     grammarcnf.to_cnf()
-    with open("python-res.txt", "w+") as f:
+    with open(Path(parent, "python-res.txt"), "w+") as f:
         f.write(str(grammarcnf))
