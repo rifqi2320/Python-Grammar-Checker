@@ -219,6 +219,10 @@ class Lexer:
           if (type(line[j]) == Symbol and str(line[j]) == "SPACE"):
             line.pop(j)
 
+      if res:
+        if str(res[-1]) != "NL":
+          res[-1].append(Symbol("NL", "\n"))
+
       # If multiline comments arent terminated
       if (self.comment_flag):
           raise SyntaxError(f"Unterminated multiline comments.")
