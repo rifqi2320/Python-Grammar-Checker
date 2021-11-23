@@ -65,6 +65,7 @@ IDIVA //=
 # Arithmetic and Binary Operator
 ADD +
 SUB -
+POW **
 MUL *
 MATMUL @
 DIV /
@@ -74,7 +75,6 @@ BOR |
 BXOR ^
 BSHL <<
 BSHR >>
-POW **
 IDIV //
 
 # Misc

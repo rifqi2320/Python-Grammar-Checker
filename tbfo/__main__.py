@@ -19,17 +19,11 @@ with open(args.file, "r") as f:
     text = f.readlines()
 res = lex.lex_lines(text)
 if res:
-    res = ' '.join([
-        str(line)
-        for x in res
-        for line in x
-    ]).split(' NL ')
     res = [
-        x + ' NL' if x != 'NL' else x
-        for x in res
-    ]
-    res = [
-        x.split(' ')
+        [
+            str(line)
+            for line in x
+        ]
         for x in res
     ]
     print(res)
