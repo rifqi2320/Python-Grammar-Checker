@@ -79,7 +79,6 @@ class Lexer:
 
     # Parse Comment (remove comments)
     i = 0
-    self.comment_flag = None
     while i < len(res):
       if self.comment_flag:
         if (type(res[i]) == Symbol):
@@ -90,14 +89,13 @@ class Lexer:
       else:
         if (type(res[i]) == Symbol):
           check = [x for x in res if str(x) != "SPACE"]
-          if (check and (("TRIPLEQUOTE" in str(check[0])) or str(res[i]) == "HASHTAG")):
+          if ((check and "TRIPLEQUOTE" in str(check[0]) and "TRIPLEQUOTE" in str(res[i])) or str(res[i]) == "HASHTAG"):
             self.comment_flag = res[i]
             res.pop(i)
           else:
             i += 1
         else:
           i += 1
-
     # Parse Strings
     string_flag = None
     for i in range(len(res) - 1, -1, -1):
@@ -160,7 +158,7 @@ class Lexer:
     try:
       for i in range(len(lines)):
         temp = self.lex(lines[i])
-        if not [x for x in temp if str(x) != "SPACE"]:
+        if not [x for x in temp if str(x) not in ["SPACE", "NL"]]:
           continue
         check = [x for x in temp if type(x) != Symbol]
         if (check):
