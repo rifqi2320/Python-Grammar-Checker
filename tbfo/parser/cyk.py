@@ -20,14 +20,41 @@ class CYK:
     # TERMINAL A B*C D JADINYA AC AD BC BD.
     # Digunakan untuk mengisi / mengecek kotak pada tabel CYK
     @staticmethod
-    def kali_silang(kiri, kanan):
+    def cross_product(left, right):
+        """Cross product between the variables contained in the CYK table 
+        that corresponds with the left and the right side of the subsequence
+        of the tokens
+
+        Args:
+            left: the left side of the subsequence of the tokens
+            right: the right side of the subsequence of the tokens
+
+        Returns:
+            A list containing the results of the productions of the two arguments.
+        """
         return [
             [l, r]
-            for l in kiri
-            for r in kanan
+            for l in left
+            for r in right
         ]
 
     def parse(self, tokens):
+        """Parse a list of tokens using the CYK algorithm
+        using the grammar from the CFG object.
+        
+        The grammars should be split into this format :
+            V = set of variables
+            T = set of terminals
+            P = dict of productions
+            S = start variable
+
+        Args:
+            tokens  (list) : Array of tokens
+
+        Returns:
+            Boolean: True if the top level of the CYK table contains the start Symbol.
+            Otherwise, False
+        """
         # INISIALISASI TABEL UNTUK CYK, ISINYA BERUPA LIST
         tabel = [
             [ [] for _ in range(len(tokens)-i) ]
@@ -53,7 +80,7 @@ class CYK:
                 # k adalah iterasi untuk banyaknya pengecekan/kali
                 # silang untuk tiap pengisian kotak pada tabel
                 for k in range(i):
-                    hasil = self.kali_silang(
+                    hasil = self.cross_product(
                         tabel[k][j],
                         tabel[i-k-1][j+k+1],
                     )
