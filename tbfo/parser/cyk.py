@@ -4,18 +4,11 @@ class CYK:
     def __init__(self, grammar: CFG, verbose=False) -> None:
         self.grammar = grammar
         (
-            variables,
+            self.variables,
             self.terminals
-        ) = self.grammar.get_cyk_form
-        variables_cache = {}
-        for prod in variables:
-            h = ' '.join(prod[1:])
-            if h not in variables_cache:
-                variables_cache[h] = []
-            variables_cache[h].append(prod[0])
-        self.variables_cache = variables_cache
+        ) = self.grammar.to_cyk()
         self.verbose = verbose
-    
+
     # ALGORITMA PERKALIAN SILANG, MISALNYA NON
     # TERMINAL A B*C D JADINYA AC AD BC BD.
     # Digunakan untuk mengisi / mengecek kotak pada tabel CYK
@@ -63,14 +56,8 @@ class CYK:
 
         # INI UNTUK MENGISI LEVEL PERTAMA DARI TABEL
         for i in range(len(tokens)):
-            for term in self.terminals:
-                # Kalau tokens ke-i ketemu di terminal,
-                # langsung gas isi pada tabel level pertama
-                if (
-                    tokens[i] == term[1]
-                    and term[0] not in tabel[0][i]
-                ):
-                    tabel[0][i].append(term[0])
+            if tokens[i] in self.terminals:
+                tabel[0][i] += self.terminals[tokens[i]]
 
         # INI UNTUK MENGISI LEVEL SISANYA DARI TABEL
         # i adalah iterasi untuk tiap level pada tabel
@@ -86,14 +73,10 @@ class CYK:
                     )
                     for h in hasil: # h adalah iterasi untuk tiap hasil kali silang
                         h = ' '.join(h)
-                        if h in self.variables_cache:
-                            if self.variables_cache[h] not in tabel[i][j]:
-                                # Kalau hasil kali silang ada di variables,
-                                # langsung gas isi pada tabel
-                                tabel[i][j] = [
-                                    *tabel[i][j],
-                                    *self.variables_cache[h]
-                                ]
+                        if h in self.variables:
+                            # Kalau hasil kali silang ada di variables,
+                            # langsung gas isi pada tabel
+                            tabel[i][j] += self.variables[h]
         # APABILA INGIN DICETAK
         if self.verbose: 
             for t in tokens:

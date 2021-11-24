@@ -1,12 +1,21 @@
 from pathlib import Path
 
-class CFG(object):
-    def __init__(self, filename=None):
-        self.is_cnf = False
-        if filename is None:
-            filename = Path(Path(__file__).parent, "examples", "python.cfg")
+EPSILON_TERM = "e"
 
-        with open(filename) as f:
+class CFG(object):
+    def __init__(self, file_path=None):
+        """Create a new Context Free Grammar object from a file.
+
+        If file_path is None then the object with python.cfg
+        grammar located in examples folder.
+
+        Args:
+            file_path (str, optional): File path of the CFG. Defaults to None.
+        """
+        if file_path is None:
+            file_path = Path(Path(__file__).parent, "examples", "python.cfg")
+
+        with open(file_path) as f:
             lines = CFG.sanitize(f.readlines())
 
         (
@@ -17,6 +26,11 @@ class CFG(object):
         ) = CFG.parse(lines)
     
     def __str__(self) -> str:
+        """Get string representation of this grammar.
+
+        Returns:
+            str: String representation of this grammar.
+        """
         return '\n'.join([
             "{key} -> {prods}"
             .format(
@@ -96,155 +110,193 @@ class CFG(object):
     
     @property
     def variables(self):
+        """Get variables of this grammar.
+
+        Returns:
+            list: List variables in this grammar.
+        """
         return list(self.productions.keys())
 
     @property
     def terminals(self):
+        """Get terminals of this grammar.
+
+        Returns:
+            list: List of terminals in this grammar.
+        """
         return self._terminals
 
-    @property
-    def get_cyk_form(self):
-        prod_vars = []
-        prod_terms = []
-        for k, prods in self.productions.items():
+    def to_cyk(self):
+        grammars = self.productions.items()
+        prod_vars: dict[str, list[str]] = {}
+        prod_terms: dict[str, list[str]] = {}
+        for k, prods in grammars:
             for prod in prods:
                 if len(prod) == 1 and prod[0].isupper():
-                    prod_terms.append([k, prod[0]])
+                    if prod[0] not in prod_terms:
+                        prod_terms[prod[0]] = []
+                    prod_terms[prod[0]].append(k)
+                elif len(prod) == 2 and not prod[0].isupper() and not prod[1].isupper():
+                    h = ' '.join(prod)
+                    if h not in prod_vars:
+                        prod_vars[h] = []
+                    prod_vars[h].append(k)
                 else:
-                    if len(prod) == 2 and not prod[0].isupper() and not prod[1].isupper():
-                        prod_vars.append([k, prod[0], prod[1]])
-                    else:
-                        raise SyntaxError(
-                            f"Grammar has invalid productions (not in CNF): {prod}"
-                        )
+                    raise SyntaxError(
+                        f"Grammar has invalid productions (not in CNF): {prod}"
+                    )
         return prod_vars, prod_terms
 
     def to_cnf(self):
-        grammar = self.productions
+        """Convert this grammar to Chomsky Normal Form.
+        """
+        grammar: dict[str, list[list[str]]] = self.productions
         keys = self.variables
-        def getVarKey(idx):
-            return f'Var{idx}'
-        
-        def getVarIdx(idx):
+        def gen_var(idx):
+            """Generate variable name for additional production.
+
+            Prevent duplicate variable name if variable somehow
+            present in grammar by adding number.
+
+            Args:
+                idx (int): Current variable index.
+
+            Returns:
+                int, str: Generated variable index and name.
+            """
             nonlocal grammar
-            while getVarKey(idx) in grammar:
+            var = 'Var{}'
+            while var.format(idx) in grammar:
                 idx += 1
-            return idx
+            return idx, var.format(idx)
 
-        def addNewGen(key, new_gen):
+        def add_new_gen(var, new_prod):
+            """Add new production in var if not exist.
+
+            Args:
+                var (str): Variable name to add new production.
+                new_gen (str): New production to add.
+            """
             nonlocal grammar
-            for i in range(len(grammar[key])):
-                if new_gen == grammar[key][i]:
+            for prod in grammar[var]:
+                if new_prod == prod:
                     return
-            grammar[key].append(new_gen)
+            grammar[var].append(new_prod)
 
-        def removeEpsilonProductions():
+        def remove_epsilon_productions():
+            """Remove any epsilon production.
+
+            Will also regenerate any production that uses that
+            epsilon production.
+            """
             nonlocal grammar, keys
-            def removeEpsilon(term):
+            def remove_epsilon(var_eps):
+                """Regenerate production if uses production `var_eps`.
+
+                It will try to add new production in any production
+                that uses `var_eps` which has an apsilon production.
+
+                Args:
+                    var_eps (str): Variable that has epsilon production.
+                """
                 nonlocal grammar, keys
-                for i in range(len(keys)):
-                    for j in range(len(grammar[keys[i]])):
-                        if (
-                            grammar[keys[i]][j].index(term)
-                            if term in grammar[keys[i]][j]
-                            else -1
-                        ) >= 0:
+                for var in keys:
+                    for prod in grammar[var]:
+                        if var_eps in prod:
                             new_gen = [[]]
-                            for k in range(len(grammar[keys[i]][j])):
-                                if grammar[keys[i]][j][k] != term:
+                            for k in range(len(prod)):
+                                if prod[k] != var_eps:
                                     for l in range(len(new_gen)):
-                                        new_gen[l].append(grammar[keys[i]][j][k])
+                                        new_gen[l].append(prod[k])
                                 else:
                                     cur_len = len(new_gen)
                                     for l in range(cur_len):
                                         new_gen.append(list(new_gen[l]))
-                                        new_gen[l].append(grammar[keys[i]][j][k])
+                                        new_gen[l].append(prod[k])
                             for k in range(len(new_gen)):
                                 if len(new_gen[k]) == 0:
-                                    new_gen[k] = ["e"]
-                                addNewGen(keys[i], new_gen[k])
+                                    new_gen[k] = [EPSILON_TERM]
+                                add_new_gen(var, new_gen[k])
             hasEmpty = True
             while hasEmpty:
                 hasEmpty = False
                 for i in range(1, len(keys)):
                     j = 0
                     while j < len(grammar[keys[i]]):
-                        if len(grammar[keys[i]][j]) == 1 and grammar[keys[i]][j][0] == "e":
+                        if len(grammar[keys[i]][j]) == 1 and grammar[keys[i]][j][0] == EPSILON_TERM:
                             grammar[keys[i]].pop(j)
                             j -= 1
-                            removeEpsilon(keys[i])
+                            remove_epsilon(keys[i])
                             hasEmpty = True
                         j += 1
         
-        def removeSingleProduction():
+        def remove_single_productions():
             nonlocal grammar, keys
             hasSingle = True
             while hasSingle:
                 hasSingle = False
-                for i in range(len(keys)):
+                for var in keys:
                     j = 0
-                    while j < len(grammar[keys[i]]):
-                        if len(grammar[keys[i]][j]) == 1 and grammar[keys[i]][j][0] in grammar:
-                            key = grammar[keys[i]][j][0]
-                            grammar[keys[i]].pop(j)
+                    while j < len(grammar[var]):
+                        if len(grammar[var][j]) == 1 and grammar[var][j][0] in grammar:
+                            key = grammar[var][j][0]
+                            grammar[var].pop(j)
                             j -= 1
                             k = 0
                             while k < len(grammar[key]):
-                                addNewGen(keys[i], grammar[key][k])
+                                add_new_gen(var, grammar[key][k])
                                 k += 1
                             hasSingle = True
                         j += 1
 
-        removeEpsilonProductions()
-        removeSingleProduction()
+        remove_epsilon_productions()
+        remove_single_productions()
 
         # Convert grammar
         helper_idx = 0
         singles = {}
         multis = {}
-        for i in range(len(keys)):
-            if len(grammar[keys[i]]) == 1:
-                if len(grammar[keys[i]][0]) == 1:
-                    term = grammar[keys[i]][0][0]
-                    if term != 'e' and term not in grammar:
-                        singles[term] = keys[i]
+        for var in keys:
+            prods = grammar[var]
+            if len(prods) == 1:
+                multis[' '.join(prods[0])] = var
+                if len(prods[0]) == 1:
+                    term = prods[0][0]
+                    if term != EPSILON_TERM and term not in grammar:
+                        singles[term] = var
 
-        for i in range(len(keys)):
-            if len(grammar[keys[i]]) == 1:
-                multis[' '.join(grammar[keys[i]][0])] = keys[i]
-        
         i = 0
         while i < len(keys):
             j = 0
-            while j < len(grammar[keys[i]]):
-                if len(grammar[keys[i]][j]) == 2:
+            prod = grammar[keys[i]]
+            while j < len(prod):
+                if len(prod[j]) == 2:
                     for k in range(2):
-                        if grammar[keys[i]][j][k] not in grammar:
-                            if grammar[keys[i]][j][k] not in singles:
-                                helper_idx = getVarIdx(helper_idx)
-                                key = getVarKey(helper_idx)
+                        if prod[j][k] not in grammar:
+                            if prod[j][k] not in singles:
+                                helper_idx, key = gen_var(helper_idx)
                                 keys.append(key)
-                                grammar[key] = [[grammar[keys[i]][j][k]]]
-                                singles[grammar[keys[i]][j][k]] = key
-                            grammar[keys[i]][j][k] = singles[grammar[keys[i]][j][k]]
-                elif len(grammar[keys[i]][j]) > 2:
-                    last = len(grammar[keys[i]][j]) - 1
-                    if grammar[keys[i]][j][last] not in grammar:
-                        if grammar[keys[i]][j][last] not in singles:
-                            helper_idx = getVarIdx(helper_idx)
-                            key = getVarKey(helper_idx)
+                                grammar[key] = [[prod[j][k]]]
+                                singles[prod[j][k]] = key
+                            prod[j][k] = singles[prod[j][k]]
+
+                elif len(prod[j]) > 2:
+                    last = len(prod[j]) - 1
+                    if prod[j][last] not in grammar:
+                        if prod[j][last] not in singles:
+                            helper_idx, key = gen_var(helper_idx)
                             keys.append(key)
-                            grammar[key] = [[grammar[keys[i]][j][last]]]
-                            singles[grammar[keys[i]][j][last]] = key
-                        grammar[keys[i]][j][last] = singles[grammar[keys[i]][j][last]]
-                    term = ' '.join(grammar[keys[i]][j][:last])
+                            grammar[key] = [[prod[j][last]]]
+                            singles[prod[j][last]] = key
+                        prod[j][last] = singles[prod[j][last]]
+
+                    term = ' '.join(prod[j][:last])
                     if term not in multis:
-                        helper_idx = getVarIdx(helper_idx)
-                        key = getVarKey(helper_idx)
+                        helper_idx, key = gen_var(helper_idx)
                         keys.append(key)
-                        grammar[key] = [grammar[keys[i]][j][:last]]
+                        grammar[key] = [prod[j][:last]]
                         multis[term] = key
-                    grammar[keys[i]][j] = [multis[term], grammar[keys[i]][j][last]]
+                    prod[j] = [multis[term], prod[j][last]]
                 j += 1
             i += 1
 
@@ -255,14 +307,13 @@ class CFG(object):
         reachable = set()
         reachable.add(keys[0])
         while front < len(queue):
-            for i in range(len(grammar[queue[front]])):
-                for j in range(len(grammar[queue[front]][i])):
-                    var = grammar[queue[front]][i][j]
-                    if var in grammar and var not in reachable:
-                        queue.append(var)
-                        reachable.add(var)
+            for prod in grammar[queue[front]]:
+                for sym in prod:
+                    if sym in grammar and sym not in reachable:
+                        queue.append(sym)
+                        reachable.add(sym)
             front += 1
-        # 2. Delete unreachable and useless prods
+        # 2. Delete useless prods
         # Delete useless and empty production first
         # Because prod can be unreachable after empty prod check
         i = 0
@@ -284,14 +335,13 @@ class CFG(object):
                 i -= 1
             i += 1
         i = 0
+        # 3. Delete unreachable prods
         while i < len(keys):
             if keys[i] not in reachable:
                 del grammar[keys[i]]
                 keys.pop(i)
                 i -= 1
             i += 1
-
-        self.is_cnf = True
 
 if __name__ == "__main__":
     grammarcnf = CFG()
