@@ -77,6 +77,24 @@ class Lexer:
     # Clean empty element
     res = [x for x in res if x]
 
+    # Parse Strings
+    string_flag = None
+    for i in range(len(res) - 1, -1, -1):
+      if (string_flag):
+        if (string_flag == res[i]):
+          res[i] = self.sym_STRING
+          string_flag = None
+        else:
+          res.pop(i)
+      else:
+        if type(res[i]) == Symbol:
+          if (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
+            string_flag = res[i]
+            res.pop(i)
+    if string_flag:
+      string_flag = None
+      raise SyntaxError("Unterminated String")
+
     # Parse Comment (remove comments)
     i = 0
     while i < len(res):
@@ -96,23 +114,6 @@ class Lexer:
             i += 1
         else:
           i += 1
-    # Parse Strings
-    string_flag = None
-    for i in range(len(res) - 1, -1, -1):
-      if (string_flag):
-        if (string_flag == res[i]):
-          res[i] = self.sym_STRING
-          string_flag = None
-        else:
-          res.pop(i)
-      else:
-        if type(res[i]) == Symbol:
-          if (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
-            string_flag = res[i]
-            res.pop(i)
-    if string_flag:
-      string_flag = None
-      raise SyntaxError("Unterminated String")
 
     # Parse Number
     number_flag = False
@@ -239,14 +240,12 @@ if __name__ == '__main__':
   with open("test.py") as f:
     lines = f.readlines()
   lexer = Lexer()
-  res = lexer.lex_lines(lines)
+  res = lexer.lex_lines(lines, False)
   for line in lines:
     print(line, end='')
   print()
   for line in res:
-    print('[')
     for a in line:
       print(str(a), end=' ')
       if (str(a) == "NL"):
         print()
-    print(']')
