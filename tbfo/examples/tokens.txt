@@ -47,11 +47,14 @@ TRIPLEQUOTE1 '''
 HASHTAG #
 
 # Assignment (+ Augmented)
-ASSIGN =
 ADDA +=
 SUBA -=
+# POW should have greater precedence than MUL
+POWA **=
 MULA *=
 MATMULA @=
+# IDIV should have greater precedence than DIV
+IDIVA //=
 DIVA /=
 MODA %=
 BANDA &=
@@ -59,15 +62,17 @@ BORA |=
 BXORA ^=
 BSHLA <<=
 BSHRA >>=
-POWA **=
-IDIVA //=
+ASSIGN =
 
 # Arithmetic and Binary Operator
 ADD +
 SUB -
+# POW should have greater precedence than MUL
 POW **
 MUL *
 MATMUL @
+# IDIV should have greater precedence than DIV
+IDIV //
 DIV /
 MOD %
 BAND &
@@ -75,14 +80,14 @@ BOR |
 BXOR ^
 BSHL <<
 BSHR >>
-IDIV //
 
 # Misc
 QUOTE2 "
 QUOTE1 '
 COLON :
 SEMICOLON ;
-ELIPSIS ...
+# ELLIPSIS should have greater precedence than DOT
+ELLIPSIS ...
 DOT .
 LC {
 RC }
