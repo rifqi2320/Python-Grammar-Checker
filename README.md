@@ -98,7 +98,7 @@ py -m tbfo {Your_python_script.py} {args}
 
 Because of the time constraints of the assignment, we skipped some values on the grammar checker like:
 
-- Async/Await function
+- Async/Await keyword
 - Multiline continuation parenthesis
 - Multiline strings
 

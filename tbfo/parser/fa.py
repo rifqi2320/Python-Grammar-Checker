@@ -15,6 +15,10 @@ class VariableChecker:
       ["q2", self.sym["upperCase"] + self.sym["lowerCase"] + self.sym["underscore"] + self.sym["number"], "q2"]]
   
   def check(self, inp):
+    """Melakukan check terhadap input string
+    
+    """
+
     state = self.startState
     for c in inp:
       transition = [x for x in self.delta if ((c in x[1]) and (x[0] in state))]

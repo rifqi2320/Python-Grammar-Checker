@@ -54,6 +54,19 @@ class Lexer:
     self.keyword_INDENT = ["IF", "ELIF", "ELSE", "FOR", "WHILE", "DEF", "CLASS", "WITH"]
 
   def lex(self, line):
+    """Tokenize a line of string into a list of Symbol Object.
+
+    Args:
+      line : input string
+
+    Raises:
+      SyntaxError : When there is an unterminated Quote in creating string.
+
+    Returns:
+      List of tokens, will include strings if there is invalid syntax for variable name
+
+    
+    """
     res = [line]
     # Tokenize symbol and whitespace
     for sym in self.symbols + self.whitespace:
@@ -77,25 +90,24 @@ class Lexer:
     # Clean empty element
     res = [x for x in res if x]
 
-    # Parse Strings
-    string_flag = None
-    for i in range(len(res) - 1, -1, -1):
-      if (string_flag):
-        if (string_flag == res[i]):
-          res[i] = self.sym_STRING
-          string_flag = None
-        else:
-          res.pop(i)
-      else:
-        if type(res[i]) == Symbol:
-          if (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
-            string_flag = res[i]
-            res.pop(i)
-    if string_flag:
-      string_flag = None
-      raise SyntaxError("Unterminated String")
+    # # Parse Strings
+    # string_flag = None
+    # for i in range(len(res) - 1, -1, -1):
+    #   if (string_flag):
+    #     if (string_flag == res[i]):
+    #       res[i] = self.sym_STRING
+    #       string_flag = None
+    #     else:
+    #       res.pop(i)
+    #   else:
+    #     if type(res[i]) == Symbol:
+    #       if (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
+    #         string_flag = res[i]
+    #         res.pop(i)
 
-    # Parse Comment (remove comments)
+
+    # Parse Strings and Comments (remove comments)
+    string_flag = None
     i = 0
     while i < len(res):
       if self.comment_flag:
@@ -104,16 +116,32 @@ class Lexer:
             if self.comment_flag == res[i]:
               self.comment_flag = None
         res.pop(i)
+      elif (string_flag):
+        if (string_flag == res[i]):
+          res[i] = self.sym_STRING
+          string_flag = None
+        else:
+          res.pop(i)
       else:
         if (type(res[i]) == Symbol):
           check = [x for x in res if str(x) != "SPACE"]
           if ((check and "TRIPLEQUOTE" in str(check[0]) and "TRIPLEQUOTE" in str(res[i])) or str(res[i]) == "HASHTAG"):
             self.comment_flag = res[i]
             res.pop(i)
+          elif (str(res[i]) == "QUOTE1" or str(res[i]) == "QUOTE2"):
+            string_flag = res[i]
+            res.pop(i)
           else:
             i += 1
         else:
           i += 1
+
+    if string_flag:
+      string_flag = None
+      raise SyntaxError("Unterminated String")
+
+    if str(self.comment_flag) == "HASHTAG":
+      self.comment_flag = None
 
     # Parse Number
     number_flag = False
@@ -149,6 +177,18 @@ class Lexer:
     return res
 
   def lex_lines(self,lines, check_indent=True):
+    """ Tokenize a list of strings into list of valid tokens
+
+    Args:
+      lines : list of line of string
+      check_indent : whether the program will check for indentation/block error
+    
+    Returns:
+      None if the syntax is invalid,
+      list : List of list of tokens if valid
+    
+    
+    """
     res = []
     indentation = [0] # indentasi yang valid
     if_flag = [] # indentasi dimana ada if
