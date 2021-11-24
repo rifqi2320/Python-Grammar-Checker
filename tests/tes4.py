@@ -1,115 +1,20 @@
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    #pepega
-    """bruh
-
-    Args:
-        B (burh): lol
+def do_something(x):
+  ''' This is a sample multiline comment
+  '''
+  if x == 0 + 1:
+    return 0
+  elif x + 4 == 1:
+    return None
+  elif x:
+    print("a")
+  else:
+    return 2
     """
-    print("f(" + str(i) + ") =", fungsi("lololo#")) # monkas
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    #pepega
-    """bruh
-
-    Args:
-        B (burh): lol
+  elif x == 32:
+    return 4
+  else:
+    return "Doodoo"
     """
-    print("f(" + str(i) + ") =", fungsi("lololo#")) # monkas
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    print("f(" + str(i) + ") =", fungsi(i))
-
-def fungsi(x):
-    return x**2 - 2*x + 5 
-
-A = int(input("Masukkan A: ")); B = int(input("Masukkan B: "))
-
-for i in range(A,B+1) : 
-    #pepega
-    """bruh
-    # bruh "pepega #njir"
-    Args:
-        B (burh): lol
-    """
-    # aman """ kok """ "qi"
-    #print("f(" + str(i) + ") =", fungsi("lololo#")) # monkas
-
+  def bruh(x):
+    x[True or False if 1 == 2 else 3 and 4:1+None+3 and 5:None and False or True] = 5
+    
